@@ -1,4 +1,5 @@
 import Phaser from "phaser";
+import { Status } from "~/utils/Predet"
 
 declare global{
     namespace Phaser.GameObjects{
@@ -8,15 +9,13 @@ declare global{
     }
 }
 
-enum Status{
-    HEALTHY,
-    DAMAGED,
-}
-
 export default class Lilith extends Phaser.Physics.Arcade.Sprite{
 
-    private healthState?:Status;
-    private damageTime:number=0;
+    private hp : number = 3;
+    private healthState? : Status;
+    private knives? : Phaser.Physics.Arcade.Group
+
+    private damageTime : number = 0;
 
     constructor(scene:Phaser.Scene, x:number, y:number, texture: string, frame?:string|number){
         super(scene,x,y,texture,frame);
@@ -25,15 +24,35 @@ export default class Lilith extends Phaser.Physics.Arcade.Sprite{
         this.anims.play("stand");
     }
 
+    setKnives(knives: Phaser.Physics.Arcade.Group){
+        this.knives = knives
+    }
+
+    public getHp(){
+        return this.hp;
+    }
+
+    public setHp(hp:number){
+        this.hp = hp
+    }
+
     onHit(dir:Phaser.Math.Vector2) {
 
-        if(this.healthState === Status.DAMAGED){
+        if(this.healthState === Status.DAMAGED || this.healthState === Status.DEAD){
             return;
         }
+
         this.setVelocity(dir.x,dir.y);
         this.setTint(0xff0000);
         this.healthState=Status.DAMAGED;
-        this.damageTime=0;
+        this.damageTime = 0;
+        this.hp = this.hp-1
+
+        if(this.hp <= 0){
+            this.healthState = Status.DEAD
+            this.setFrame("idle0000")
+            this.anims.stop()
+        }
     }
 
     preUpdate(time: number, delta: number) {
@@ -51,13 +70,64 @@ export default class Lilith extends Phaser.Physics.Arcade.Sprite{
                     this.damageTime=0;
                 }
             break;
+            case Status.DEAD:
+                
+            break;
         }
+    }
+
+    private attack(){
+
+        if(!this.knives){
+            return
+        }
+
+        const direction = this.anims.currentAnim.key.charAt(4);
+        const vec = new Phaser.Math.Vector2(0,0)
+
+        switch(direction){
+            case 'F':
+                vec.y = 1
+            break;
+            case 'B':
+                vec.y = -1
+            break;
+            case 'R':
+                vec.x = -1
+            break;
+            case 'L':
+                vec.x = 1
+            break;
+            default:
+                vec.x = 1
+            break;
+        }
+
+        const angle = vec.angle()
+        const knife = this.knives.get(this.x, this.y, 'knife') as Phaser.Physics.Arcade.Image
+
+        knife.setActive(true)
+        knife.setVisible(true)
+
+        knife.setRotation(angle)
+        knife.setVelocity(vec.x * 300, vec.y *300)
     }
 
     update(cursors: Phaser.Types.Input.Keyboard.CursorKeys) {
 
         if(this.healthState === Status.DAMAGED){
             return;
+        }
+
+        if(this.healthState === Status.DEAD){
+            this.setVelocity(0, 0)
+            return
+        }
+
+        if(Phaser.Input.Keyboard.JustDown(cursors.space)){
+            this.attack()
+
+            return
         }
 
         if (cursors.left.isDown) {
