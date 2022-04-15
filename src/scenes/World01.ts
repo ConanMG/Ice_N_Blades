@@ -57,7 +57,7 @@ export default class World01 extends Phaser.Scene
         //Añadir los objetos al mapa y activar las colisiones de los mismos
 
         this.lilith = this.add.Lilith(32, 32, 'Lilith');
-        this.lilith.setKnives(this.knives)
+        this.lilith.setWeapon(this.knives)
         
         this.thieves = this.physics.add.group({
             classType: Thief,
@@ -102,9 +102,9 @@ export default class World01 extends Phaser.Scene
         const dir = new Phaser.Math.Vector2(dx,dy).normalize().scale(200);
 
         this.lilith.onHit(dir);
-        sceneEvents.emit('player-took-damage', this.lilith.getHp())
+        sceneEvents.emit('player-took-damage', this.lilith.hp())
 
-        if(this.lilith.getHp()<=0){
+        if(this.lilith.hp()<=0){
             this.thiefLiliColl?.destroy();
         }
 

@@ -1,5 +1,6 @@
 import Phaser from "phaser";
 import { Status } from "~/utils/Predet"
+import { Character } from "./Character";
 
 declare global{
     namespace Phaser.GameObjects{
@@ -9,65 +10,28 @@ declare global{
     }
 }
 
-export default class Lilith extends Phaser.Physics.Arcade.Sprite{
-
-    private hp : number = 3;
-    private healthState? : Status;
-    private knives? : Phaser.Physics.Arcade.Group
-
-    private damageTime : number = 0;
+export default class Lilith extends Character {
 
     constructor(scene:Phaser.Scene, x:number, y:number, texture: string, frame?:string|number){
         super(scene,x,y,texture,frame);
-        this.healthState=Status.HEALTHY
+        this._healthState=Status.HEALTHY
 
         this.anims.play("stand");
-    }
-
-    setKnives(knives: Phaser.Physics.Arcade.Group){
-        this.knives = knives
-    }
-
-    public getHp(){
-        return this.hp;
-    }
-
-    public setHp(hp:number){
-        this.hp = hp
-    }
-
-    onHit(dir:Phaser.Math.Vector2) {
-
-        if(this.healthState === Status.DAMAGED || this.healthState === Status.DEAD){
-            return;
-        }
-
-        this.setVelocity(dir.x,dir.y);
-        this.setTint(0xff0000);
-        this.healthState=Status.DAMAGED;
-        this.damageTime = 0;
-        this.hp = this.hp-1
-
-        if(this.hp <= 0){
-            this.healthState = Status.DEAD
-            this.setFrame("idle0000")
-            this.anims.stop()
-        }
     }
 
     preUpdate(time: number, delta: number) {
 
         super.preUpdate(time, delta);
 
-        switch(this.healthState){
+        switch(this._healthState){
             case Status.HEALTHY:
             break;
             case Status.DAMAGED:
-                this.damageTime+=delta;
-                if(this.damageTime >= 250){
-                    this.healthState=Status.HEALTHY
+                this._damageTime+=delta;
+                if(this._damageTime >= 150){
+                    this._healthState=Status.HEALTHY
                     this.setTint(0xffffff);
-                    this.damageTime=0;
+                    this._damageTime=0;
                 }
             break;
             case Status.DEAD:
@@ -78,7 +42,7 @@ export default class Lilith extends Phaser.Physics.Arcade.Sprite{
 
     private attack(){
 
-        if(!this.knives){
+        if(!this._weapon){
             return
         }
 
@@ -104,7 +68,7 @@ export default class Lilith extends Phaser.Physics.Arcade.Sprite{
         }
 
         const angle = vec.angle()
-        const knife = this.knives.get(this.x, this.y, 'knife') as Phaser.Physics.Arcade.Image
+        const knife = this._weapon.get(this.x, this.y, 'knife') as Phaser.Physics.Arcade.Image
 
         knife.setActive(true)
         knife.setVisible(true)
@@ -115,11 +79,13 @@ export default class Lilith extends Phaser.Physics.Arcade.Sprite{
 
     update(cursors: Phaser.Types.Input.Keyboard.CursorKeys) {
 
-        if(this.healthState === Status.DAMAGED){
+        this.checkXp();
+        
+        if(this._healthState === Status.DAMAGED){
             return;
         }
 
-        if(this.healthState === Status.DEAD){
+        if(this._healthState === Status.DEAD){
             this.setVelocity(0, 0)
             return
         }

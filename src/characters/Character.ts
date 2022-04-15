@@ -1,32 +1,34 @@
 import Phaser from "phaser";
 import { Status } from "~/utils/Predet";
 
-export default abstract class extends Phaser.Physics.Arcade.Sprite{
+export abstract class Character extends Phaser.Physics.Arcade.Sprite {
 
-    protected MAX_HP!: number;
-    protected _hp!: number;
-    protected _skills: Map<string, number> = new Map<string,number>([
-        ['str', 0],
-        ['dex', 0],
-        ['con', 0],
-        ['int', 0],
-        ['wis', 0],
-        ['cha', 0]
-    ])
+    protected NEXT_LEVEL_XP = 1000
+    protected MAX_HP : number = 3;
+    protected _hp : number = 3;
+    protected _healthState! : Status;
+    protected _skills!: Map<string, number>
     protected _ac!: number;
 
-    protected _weapon!: Phaser.Physics.Arcade.Group;
-    
-    protected _damageTime!: number;
+    protected _weapon! : Phaser.Physics.Arcade.Group
+
     protected _xp!: number;
     protected _lvl!: number;
     protected _skillPoints!:number;
+
+    protected _damageTime : number = 0;
 
     public hp(){
         return this._hp;
     }
     public setHp(hp: number) {
         this._hp = hp;
+    }
+    public healthState(){
+        return this._healthState;
+    }
+    public setHealthState(healthState: Status) {
+        this._healthState = healthState;
     }
     public getSkill(skill: string) {
         return this._skills[skill];
@@ -40,14 +42,8 @@ export default abstract class extends Phaser.Physics.Arcade.Sprite{
     public weapon(){
         return this._weapon;
     }
-    public setWeapon(weapon: Phaser.Physics.Arcade.Group) {
-        this._weapon = weapon;
-    }
-    public damageTime(){
-        return this._damageTime;
-    }
-    public setDamageTime(damageTime: number) {
-        this._damageTime = damageTime;
+    public setWeapon(knives: Phaser.Physics.Arcade.Group){
+        this._weapon = knives
     }
     public lvl(){
         return this._lvl;
@@ -66,9 +62,17 @@ export default abstract class extends Phaser.Physics.Arcade.Sprite{
     }
     public setSkillPoints(skillPoints: number) {
         this._skillPoints = skillPoints;
+    } 
+
+    checkXp(){
+        if(this._xp == this.NEXT_LEVEL_XP)
+            this.lvlUp()
     }
 
-    public lowerSkill(skill: string){
+    lvlUp() {
+    }
+
+    lowerSkill(skill: string){
         switch (skill){
             case 'str':
                 this._skills['str']--
@@ -100,7 +104,7 @@ export default abstract class extends Phaser.Physics.Arcade.Sprite{
         }
     }
 
-    public raiseSkill(skill: string){
+    raiseSkill(skill: string){
         switch (skill){
             case 'str':
                 this._skills['str']++
@@ -131,7 +135,7 @@ export default abstract class extends Phaser.Physics.Arcade.Sprite{
         }
     }
 
-    public levelUp(){
+    levelUp() {
         this.MAX_HP+= 1 * this._skills['con'];
         this._hp = this.MAX_HP;
 
@@ -139,16 +143,40 @@ export default abstract class extends Phaser.Physics.Arcade.Sprite{
         this._skillPoints += 2;
     }
 
-    protected setupSkills(str: number, dex: number, con: number, int: number, wis: number, cha: number){
-        this._skills['str'] = str
-        this._skills['dex'] = dex
-        this._skills['con'] = con
-        this._skills['int'] = int
-        this._skills['wis'] = wis
-        this._skills['cha'] = cha
+    onHit(dir:Phaser.Math.Vector2) {
+
+        if(this._healthState === Status.DAMAGED || this._healthState === Status.DEAD){
+            return;
+        }
+
+        this.setVelocity(dir.x,dir.y);
+        this.setTint(0xff0000);
+        this._healthState=Status.DAMAGED;
+        this._damageTime = 0;
+        this._hp = this._hp-1
+
+        if(this._hp <= 0){
+            this._healthState = Status.DEAD
+            this.setFrame("idle0000")
+            this.anims.stop()
+        }
     }
+    
+    setupSkills(str: number, dex: number, con: number, int: number, wis: number, cha: number) {
+        this._skills = new Map<string,number>([
+            ['str', 0],
+            ['dex', 0],
+            ['con', 0],
+            ['int', 0],
+            ['wis', 0],
+            ['cha', 0]
+        ])
 
-    public takeDamage(){
-
+        this._skills['str'] = str;
+        this._skills['dex'] = dex;
+        this._skills['con'] = con;
+        this._skills['int'] = int;
+        this._skills['wis'] = wis;
+        this._skills['cha'] = cha;
     }
 }
