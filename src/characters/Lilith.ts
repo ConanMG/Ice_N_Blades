@@ -16,7 +16,7 @@ export default class Lilith extends Character {
         super(scene,x,y,texture,frame);
         this._healthState=Status.HEALTHY
 
-        this.anims.play("stand");
+        this.anims.play("idle");
     }
 
     preUpdate(time: number, delta: number) {
@@ -29,13 +29,14 @@ export default class Lilith extends Character {
             case Status.DAMAGED:
                 this._damageTime+=delta;
                 if(this._damageTime >= 150){
-                    this._healthState=Status.HEALTHY
+                    this._healthState=Status.HEALTHY;
+                    this._hp = this._hp - 1; 
                     this.setTint(0xffffff);
                     this._damageTime=0;
                 }
             break;
             case Status.DEAD:
-                
+                this.anims.play('death', true);
             break;
         }
     }
@@ -46,20 +47,20 @@ export default class Lilith extends Character {
             return
         }
 
-        const direction = this.anims.currentAnim.key.charAt(4);
+        const direction = this.anims.currentAnim.key.toString();
         const vec = new Phaser.Math.Vector2(0,0)
 
         switch(direction){
-            case 'F':
+            case 'down':
                 vec.y = 1
             break;
-            case 'B':
+            case 'up':
                 vec.y = -1
             break;
-            case 'R':
+            case 'left':
                 vec.x = -1
             break;
-            case 'L':
+            case 'right':
                 vec.x = 1
             break;
             default:
@@ -82,11 +83,12 @@ export default class Lilith extends Character {
         this.checkXp();
         
         if(this._healthState === Status.DAMAGED){
+            this.anims.play('hurt', true);
             return;
         }
 
         if(this._healthState === Status.DEAD){
-            this.setVelocity(0, 0)
+            this.setVelocity(0, 0);
             return
         }
 
@@ -99,23 +101,23 @@ export default class Lilith extends Character {
         if (cursors.left.isDown) {
             this.setVelocityX(-150);
             this.setVelocityY(0);
-            this.anims.play('walkR', true);
+            this.anims.play('left', true);
         } else if (cursors.right.isDown) {
             this.setVelocityX(150);
             this.setVelocityY(0);
-            this.anims.play('walkL', true);
+            this.anims.play('right', true);
         }else if (cursors.down.isDown) {
             this.setVelocityY(150);
             this.setVelocityX(0);
-            this.anims.play('walkF', true);
+            this.anims.play('down', true);
         }else if (cursors.up.isDown) {
             this.setVelocityY(-150);
             this.setVelocityX(0);
-            this.anims.play('walkB', true);
+            this.anims.play('up', true);
         } else {
             this.setVelocityX(0);
             this.setVelocityY(0);
-            this.play('stand', true)
+            this.play('idle', true)
         }
         
     }
@@ -129,7 +131,6 @@ Phaser.GameObjects.GameObjectFactory.register("Lilith", function(this:Phaser.Gam
     this.updateList.add(sprite);
 
     this.scene.physics.world.enableBody(sprite, Phaser.Physics.Arcade.DYNAMIC_BODY);
-    sprite.setScale(0.5,0.5);
 
     return sprite;
 })

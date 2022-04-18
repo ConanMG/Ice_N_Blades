@@ -43,8 +43,8 @@ export abstract class Enemy extends Phaser.Physics.Arcade.Sprite {
         })
 
         this._hp = 0.5 * this._stats['con'];
-        this._detectionRange = 5 * this._stats['wis'];
-        this._speed = 10 * this._stats['dex'];
+        this._detectionRange = 50;
+        this._speed = 100;
     }
 
     setTarget(target: Phaser.GameObjects.Components.Transform){

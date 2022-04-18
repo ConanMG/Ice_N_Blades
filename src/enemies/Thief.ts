@@ -5,11 +5,11 @@ import { Enemy } from './Enemies';
 
 const randomDirection = (exclude:Direction)=>{
 
-    let newDirection = Phaser.Math.Between(0,3);
+    let newDirection = Phaser.Math.Between(0,4);
 
     while(newDirection === exclude){
 
-        newDirection = Phaser.Math.Between(0,3);
+        newDirection = Phaser.Math.Between(0,4);
 
     }
     
@@ -22,13 +22,19 @@ export default class Thief extends Enemy {
         super(scene, x, y, texture, frame);
         this.setupStats(12, 16, 10, 8, 6, 14);
 
-        this.anims.play('thiefRun');
+        this.anims.play('thief_run');
 
         scene.physics.world.on(Phaser.Physics.Arcade.Events.TILE_COLLIDE, this.onTileCollision, this)
         this._moveEvent=scene.time.addEvent({
             delay:2000,
             callback: ()=>{
                 this._direction=randomDirection(this._direction);
+                if(this._direction === Direction.STOP){
+                    this.anims.play('thief_idle')
+                }
+                else{
+                    this.anims.play('thief_run')
+                }
             },
             loop:true
         })
@@ -73,12 +79,12 @@ export default class Thief extends Enemy {
                     this.setVelocityX(0)
                 break;
                 case Direction.LEFT:
-                    this.setFlipX(true);
+                    this.setFlipX(false);
                     this.setVelocityX(-this._speed)
                     this.setVelocityY(0)
                 break;
                 case Direction.RIGHT:
-                    this.setFlipX(false);
+                    this.setFlipX(true);
                     this.setVelocityX(this._speed)
                     this.setVelocityY(0)
                 break;

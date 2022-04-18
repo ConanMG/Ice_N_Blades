@@ -12,12 +12,12 @@ const config: Phaser.Types.Core.GameConfig = {
 	physics: {
 		default: 'arcade',
 		arcade: {
-			debug:true
+			debug:false
 		}
 	},
 	scene: [Preloader_World01, World01, World01_UI],
 	scale:{
-		zoom:1.5
+		zoom:2.5
 	}
 }
 

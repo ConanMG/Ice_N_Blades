@@ -48,7 +48,7 @@ export default class World01 extends Phaser.Scene
 
         walls.setCollisionByProperty({collide: true})
 
-        debugCollisions(walls, this)
+        //debugCollisions(walls, this)
 
         this.knives = this.physics.add.group({
             classType: Phaser.Physics.Arcade.Image
@@ -56,7 +56,7 @@ export default class World01 extends Phaser.Scene
 
         //Añadir los objetos al mapa y activar las colisiones de los mismos
 
-        this.lilith = this.add.Lilith(32, 32, 'Lilith');
+        this.lilith = this.add.Lilith(48, 48, 'Lilith');
         this.lilith.setWeapon(this.knives)
         
         this.thieves = this.physics.add.group({

@@ -7,8 +7,8 @@ export default class World01_Preloader extends Phaser.Scene {
     }
 
     preload() {
-        this.load.atlas('Lilith', 'character/Lilith.png', 'character/Lilith.json');
-        this.load.atlas('Thief', 'enemies/Thief.png', 'enemies/Thief.json');
+        this.load.atlas('Lilith', 'character/Main_Spritesheet.png', 'character/Main_Spritesheet.json');
+        this.load.atlas('Thief', 'enemies/Thief_Spritesheet.png', 'enemies/Thief_Spritesheet.json');
         this.load.image('tiles', 'tiles/TilesExtruded.png')
         this.load.tilemapTiledJSON('map', 'dungeons/Mapa.json')
 

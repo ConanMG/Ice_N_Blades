@@ -157,8 +157,7 @@ export abstract class Character extends Phaser.Physics.Arcade.Sprite {
 
         if(this._hp <= 0){
             this._healthState = Status.DEAD
-            this.setFrame("idle0000")
-            this.anims.stop()
+            this.anims.play('death')
         }
     }
     
