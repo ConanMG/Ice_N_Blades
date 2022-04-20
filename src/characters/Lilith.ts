@@ -12,6 +12,8 @@ declare global{
 
 export default class Lilith extends Character {
 
+    private _lastDirection!: string;
+
     constructor(scene:Phaser.Scene, x:number, y:number, texture: string, frame?:string|number){
         super(scene,x,y,texture,frame);
         this._healthState=Status.HEALTHY
@@ -27,16 +29,15 @@ export default class Lilith extends Character {
             case Status.HEALTHY:
             break;
             case Status.DAMAGED:
-                this._damageTime+=delta;
+                this._damageTime += delta;
                 if(this._damageTime >= 150){
-                    this._healthState=Status.HEALTHY;
-                    this._hp = this._hp - 1; 
+                    this._healthState = Status.HEALTHY;
                     this.setTint(0xffffff);
-                    this._damageTime=0;
+                    this._damageTime = 0;
                 }
             break;
             case Status.DEAD:
-                this.anims.play('death', true);
+                this.setTint(0xffffff);
             break;
         }
     }
@@ -46,11 +47,9 @@ export default class Lilith extends Character {
         if(!this._weapon){
             return
         }
-
-        const direction = this.anims.currentAnim.key.toString();
         const vec = new Phaser.Math.Vector2(0,0)
 
-        switch(direction){
+        switch(this._lastDirection){
             case 'down':
                 vec.y = 1
             break;
@@ -80,6 +79,10 @@ export default class Lilith extends Character {
 
     update(cursors: Phaser.Types.Input.Keyboard.CursorKeys) {
 
+        if (this._gameOver){
+            return;
+        }
+
         this.checkXp();
         
         if(this._healthState === Status.DAMAGED){
@@ -89,34 +92,59 @@ export default class Lilith extends Character {
 
         if(this._healthState === Status.DEAD){
             this.setVelocity(0, 0);
+            this.anims.play('death', true)
+            this.on("animationcomplete", ()=>{
+                this._gameOver = true;
+                this.destroy();
+            })
             return
         }
 
         if(Phaser.Input.Keyboard.JustDown(cursors.space)){
-            this.attack()
-
+            this.attack();
             return
         }
 
         if (cursors.left.isDown) {
+            this.setFlipX(false)
             this.setVelocityX(-150);
             this.setVelocityY(0);
             this.anims.play('left', true);
+            this._lastDirection = this.anims.currentAnim.key;
         } else if (cursors.right.isDown) {
+            this.setFlipX(false)
             this.setVelocityX(150);
             this.setVelocityY(0);
             this.anims.play('right', true);
+            this._lastDirection = this.anims.currentAnim.key;
         }else if (cursors.down.isDown) {
+            this.setFlipX(false)
             this.setVelocityY(150);
             this.setVelocityX(0);
             this.anims.play('down', true);
+            this._lastDirection = this.anims.currentAnim.key;
         }else if (cursors.up.isDown) {
+            this.setFlipX(false)
             this.setVelocityY(-150);
             this.setVelocityX(0);
             this.anims.play('up', true);
+            this._lastDirection = this.anims.currentAnim.key;
         } else {
             this.setVelocityX(0);
             this.setVelocityY(0);
+
+            switch(this._lastDirection){
+                case 'right' || 'up':
+                    this.setFlipX(false)
+                    break;
+                case 'left' || 'down':
+                    this.setFlipX(true)
+                    break;
+                default:
+                    this.setFlipX(false)
+                    break;
+            }
+
             this.play('idle', true)
         }
         

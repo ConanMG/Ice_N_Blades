@@ -7,17 +7,18 @@ import World01_UI from './scenes/World01_UI'
 
 const config: Phaser.Types.Core.GameConfig = {
 	type: Phaser.AUTO,
-	width: 800,
-	height: 600,
+	width: 900,
+	height: 400,
 	physics: {
 		default: 'arcade',
 		arcade: {
-			debug:false
+			fixedStep: false,
+			debug: true
 		}
 	},
 	scene: [Preloader_World01, World01, World01_UI],
 	scale:{
-		zoom:2.5
+		zoom: 1
 	}
 }
 

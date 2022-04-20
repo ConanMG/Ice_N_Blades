@@ -1,4 +1,4 @@
-import Phaser from 'phaser';
+import Phaser, { Physics } from 'phaser';
 import { Character } from '~/characters/Character';
 import { Direction, Status } from '~/utils/Predet';
 import { Enemy } from './Enemies';
@@ -23,6 +23,7 @@ export default class Thief extends Enemy {
         this.setupStats(12, 16, 10, 8, 6, 14);
 
         this.anims.play('thief_run');
+        this._healthState = Status.HEALTHY;
 
         scene.physics.world.on(Phaser.Physics.Arcade.Events.TILE_COLLIDE, this.onTileCollision, this)
         this._moveEvent=scene.time.addEvent({
@@ -32,7 +33,7 @@ export default class Thief extends Enemy {
                 if(this._direction === Direction.STOP){
                     this.anims.play('thief_idle')
                 }
-                else{
+                else {
                     this.anims.play('thief_run')
                 }
             },
@@ -57,16 +58,44 @@ export default class Thief extends Enemy {
     preUpdate(time: number, delta: number): void {
         
         super.preUpdate(time,delta);
+        
+        if (this._gameOver) {
+            return; 
+        }
 
+        switch(this._healthState){
+            case Status.HEALTHY:
+                this.setTint(0xffffff);
+                this._damageTime = 0;
+                break;
+            case Status.DAMAGED:
+                this.setVelocity(0, 0)
+                this.setTint(0xff0000);
+                this.anims.play('thief_hurt', true);
+                this.on('animationcomplete', ()=>{
+                    this._healthState = Status.HEALTHY;
+                    this.anims.play('thief_run')
+                })
+                return;
+            case Status.DEAD:
+                this.setVelocity(0, 0)
+                this.anims.play('thief_death', true)
+                this.on("animationcomplete", ()=>{
+                    this._gameOver = true;
+                    this.destroy()
+                })
+                return;
+        }
+    
         if(this._target){
             var character: Character = this._target as Character
-            if(character.healthState() !== Status.DEAD)
+            if(character.healthState() != Status.DEAD)
                 this.setAggro()
             else
                 this._aggro=false;
         }
-
-        if(!this._aggro) {
+    
+        if(!this._aggro ) {
             switch(this._direction){
                 case Direction.UP:
                     this.setFlipX(true);

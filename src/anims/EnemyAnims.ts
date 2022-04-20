@@ -23,7 +23,7 @@ const createThiefAnims = (anims: Phaser.Animations.AnimationManager)=>{
             key: 'thief_hurt',
             frames: anims.generateFrameNames('Thief', { prefix: 'Hurt', end: 2, zeroPad: 4 }),
             frameRate: 5,
-            repeat: -1
+            repeat: 0
         }
     );
     anims.create(
@@ -31,7 +31,7 @@ const createThiefAnims = (anims: Phaser.Animations.AnimationManager)=>{
             key: 'thief_death',
             frames: anims.generateFrameNames('Thief', { prefix: 'Death', end: 4, zeroPad: 4 }),
             frameRate: 5,
-            repeat: -1
+            repeat: 0
         }
     );
 

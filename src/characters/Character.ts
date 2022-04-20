@@ -9,6 +9,7 @@ export abstract class Character extends Phaser.Physics.Arcade.Sprite {
     protected _healthState! : Status;
     protected _skills!: Map<string, number>
     protected _ac!: number;
+    protected _gameOver!: boolean;
 
     protected _weapon! : Phaser.Physics.Arcade.Group
 
@@ -66,10 +67,7 @@ export abstract class Character extends Phaser.Physics.Arcade.Sprite {
 
     checkXp(){
         if(this._xp == this.NEXT_LEVEL_XP)
-            this.lvlUp()
-    }
-
-    lvlUp() {
+            this.levelUp()
     }
 
     lowerSkill(skill: string){
@@ -145,19 +143,18 @@ export abstract class Character extends Phaser.Physics.Arcade.Sprite {
 
     onHit(dir:Phaser.Math.Vector2) {
 
-        if(this._healthState === Status.DAMAGED || this._healthState === Status.DEAD){
+        if(this._healthState === Status.DAMAGED){
             return;
         }
 
         this.setVelocity(dir.x,dir.y);
         this.setTint(0xff0000);
-        this._healthState=Status.DAMAGED;
+        this._healthState = Status.DAMAGED;
         this._damageTime = 0;
-        this._hp = this._hp-1
+        this._hp = this._hp-1;
 
         if(this._hp <= 0){
             this._healthState = Status.DEAD
-            this.anims.play('death')
         }
     }
     

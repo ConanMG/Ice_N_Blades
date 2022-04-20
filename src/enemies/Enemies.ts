@@ -1,10 +1,10 @@
 import Phaser from "phaser";
-import { Character } from "~/characters/Character";
-import { Direction } from "~/utils/Predet";
+import { Direction, Status } from "~/utils/Predet";
 
 export abstract class Enemy extends Phaser.Physics.Arcade.Sprite {
 
     protected _hp!: number;
+    protected _healthState!: Status;
     protected _speed!: number
     protected _direction!: Direction
     protected _stats!: Map<string, number>
@@ -13,6 +13,9 @@ export abstract class Enemy extends Phaser.Physics.Arcade.Sprite {
     protected _aggro: boolean = false;
     protected _moveEvent!: Phaser.Time.TimerEvent
     protected _detectionRange!: number;
+
+    protected _damageTime!: number;
+    protected _gameOver!: boolean;
 
     constructor(scene: Phaser.Scene, x: number, y: number, texture: string, frame?: string | number){
         super(scene, x, y, texture, frame);
@@ -42,13 +45,27 @@ export abstract class Enemy extends Phaser.Physics.Arcade.Sprite {
                 stat = minStat;
         })
 
-        this._hp = 0.5 * this._stats['con'];
-        this._detectionRange = 50;
-        this._speed = 100;
+        this._hp = 0.5 * (this._stats['con'] / 2);
+        this._detectionRange = 15 + (this._stats['wis'] / 2);
+        this._speed = 100 + (this._stats['dex'] * 2);
     }
 
     setTarget(target: Phaser.GameObjects.Components.Transform){
         this._target = target;
+    }
+
+    onHit() {
+
+        if(this._healthState === Status.DAMAGED){
+            return;
+        }
+
+        this._healthState = Status.DAMAGED;
+        this._hp = this._hp-1
+
+        if(this._hp <= 0){
+            this._healthState = Status.DEAD;
+        }
     }
 
     setAggro(){

@@ -40,11 +40,11 @@ export default class World01 extends Phaser.Scene
 
         //Mapa
 
-        var map=this.make.tilemap({key:'map'});
-        var tileset=map.addTilesetImage('Tiles', 'tiles', 16, 16, 1, 2);
+        var map = this.make.tilemap({key:'map'});
+        var tileset = map.addTilesetImage('Tiles', 'tiles', 16, 16, 1, 2);
 
-        const ground=map.createLayer('Ground', tileset);
-        const walls=map.createLayer('Walls', tileset);
+        const ground = map.createLayer('Ground', tileset);
+        const walls = map.createLayer('Walls', tileset);
 
         walls.setCollisionByProperty({collide: true})
 
@@ -73,7 +73,8 @@ export default class World01 extends Phaser.Scene
         this.physics.add.collider(this.knives, walls, this.onKnifeWallCollision, undefined, this)
         this.physics.add.collider(this.thieves, this.knives, this.onKnifeThiefCollision, undefined, this)
         this.thiefLiliColl = this.physics.add.collider(this.thieves, this.lilith, this.onThiefCollision, undefined, this);
-        this.cameras.main.startFollow(this.lilith, true);
+        this.cameras.main.startFollow(this.lilith, true, 1, 1);
+        this.cameras.main.centerOn(this.lilith.x, this.lilith.y);
 
     }
 
@@ -84,20 +85,22 @@ export default class World01 extends Phaser.Scene
         knife.destroy();
     }
 
-    private onKnifeThiefCollision(thief: Phaser.GameObjects.GameObject, knife: Phaser.GameObjects.GameObject){
+    private onKnifeThiefCollision(obj1: Phaser.GameObjects.GameObject, knife: Phaser.GameObjects.GameObject){
+        
+        var thief = obj1 as Thief;
         this.knives.killAndHide(knife);
-        this.thieves.killAndHide(thief);
+
+        thief.onHit();
 
         knife.destroy();
-        thief.destroy();
     }
 
     private onThiefCollision(player:Phaser.GameObjects.GameObject, attacker:Phaser.GameObjects.GameObject){
         
-        const enemy=attacker as Thief;
-
-        const dx=this.lilith.x - enemy.x
-        const dy=this.lilith.y - enemy.y
+        const enemy = attacker as Thief;
+ 
+        const dx = this.lilith.x - enemy.x
+        const dy = this.lilith.y - enemy.y
 
         const dir = new Phaser.Math.Vector2(dx,dy).normalize().scale(200);
 
