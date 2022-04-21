@@ -5,21 +5,29 @@ export abstract class Enemy extends Phaser.Physics.Arcade.Sprite {
 
     protected _hp!: number;
     protected _healthState!: Status;
-    protected _speed!: number
+    protected _speed!: number;
+    protected _damage!: number;
     protected _direction!: Direction
     protected _stats!: Map<string, number>
 
     protected _target!: Phaser.GameObjects.Components.Transform;
     protected _aggro: boolean = false;
     protected _moveEvent!: Phaser.Time.TimerEvent
+    protected _hitEvent!: Phaser.Time.TimerEvent
     protected _detectionRange!: number;
 
+    protected _justHit!: boolean;
     protected _damageTime!: number;
     protected _gameOver!: boolean;
 
     constructor(scene: Phaser.Scene, x: number, y: number, texture: string, frame?: string | number){
         super(scene, x, y, texture, frame);
 
+
+    }
+
+    continueChase(){
+        this._justHit = false;
     }
 
     setupStats(maxStr: number, maxDex: number, maxCon: number, maxInt: number, maxWis: number, maxCha: number){
@@ -45,33 +53,58 @@ export abstract class Enemy extends Phaser.Physics.Arcade.Sprite {
                 stat = minStat;
         })
 
-        this._hp = 0.5 * (this._stats['con'] / 2);
+        if(this._stats['str'] > this._stats['dex'])
+            this._damage = this._stats['str'];
+        else
+            this._damage = this._stats['dex'];
+        
+        this._hp = 10 * this._stats['con'];
         this._detectionRange = 15 + (this._stats['wis'] / 2);
         this._speed = 100 + (this._stats['dex'] * 2);
+    }
+
+    damage() {
+        return this._damage;
     }
 
     setTarget(target: Phaser.GameObjects.Components.Transform){
         this._target = target;
     }
 
-    onHit() {
+    onHit(damage: number) {
 
         if(this._healthState === Status.DAMAGED){
             return;
         }
 
         this._healthState = Status.DAMAGED;
-        this._hp = this._hp-1
+        this._hp = this._hp - damage;
 
         if(this._hp <= 0){
             this._healthState = Status.DEAD;
         }
     }
 
+    onPlayerCollision(dir: Phaser.Math.Vector2){
+
+        this._aggro = false;
+        this._justHit = true;
+        this.setVelocity(-dir.x,-dir.y);
+
+        this._hitEvent=this.scene.time.addEvent({
+            delay:200,
+            callback: ()=>{
+                this.continueChase();
+            },
+            loop:false
+        })
+
+    }
+
     setAggro(){
         var xDistance = this.x - this._target!.x
         var yDistance = this.y - this._target!.y
-        if(xDistance < this._detectionRange && xDistance > -this._detectionRange || yDistance < this._detectionRange && yDistance > -this._detectionRange) {
+        if(Math.abs(xDistance) < this._detectionRange || Math.abs(yDistance) < this._detectionRange) {
             this._aggro = true;
         }
         else {

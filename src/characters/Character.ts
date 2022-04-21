@@ -1,15 +1,18 @@
 import Phaser from "phaser";
+import { HealthBar } from "~/utils/Healthbar";
 import { Status } from "~/utils/Predet";
 
 export abstract class Character extends Phaser.Physics.Arcade.Sprite {
 
     protected NEXT_LEVEL_XP = 1000
-    protected MAX_HP : number = 3;
-    protected _hp : number = 3;
+    protected _MAX_HP!: number;
+    protected _hp!: number;
+    protected _speed: any;
     protected _healthState! : Status;
     protected _skills!: Map<string, number>
     protected _ac!: number;
     protected _gameOver!: boolean;
+    protected _damage!: number;
 
     protected _weapon! : Phaser.Physics.Arcade.Group
 
@@ -17,13 +20,20 @@ export abstract class Character extends Phaser.Physics.Arcade.Sprite {
     protected _lvl!: number;
     protected _skillPoints!:number;
 
-    protected _damageTime : number = 0;
+    protected _damageTime: number = 0;
+    protected _healthBar!: HealthBar;
 
     public hp(){
         return this._hp;
     }
     public setHp(hp: number) {
         this._hp = hp;
+    }
+    public MAX_HP() {
+        return this._MAX_HP;
+    }
+    public damage() {
+        return this._damage;
     }
     public healthState(){
         return this._healthState;
@@ -63,7 +73,7 @@ export abstract class Character extends Phaser.Physics.Arcade.Sprite {
     }
     public setSkillPoints(skillPoints: number) {
         this._skillPoints = skillPoints;
-    } 
+    }
 
     checkXp(){
         if(this._xp == this.NEXT_LEVEL_XP)
@@ -134,14 +144,14 @@ export abstract class Character extends Phaser.Physics.Arcade.Sprite {
     }
 
     levelUp() {
-        this.MAX_HP+= 1 * this._skills['con'];
-        this._hp = this.MAX_HP;
+        this._MAX_HP+= 1 * this._skills['con'];
+        this._hp = this._MAX_HP;
 
         this._lvl += 1;
         this._skillPoints += 2;
     }
 
-    onHit(dir:Phaser.Math.Vector2) {
+    onHit(dir:Phaser.Math.Vector2, damage: number) {
 
         if(this._healthState === Status.DAMAGED){
             return;
@@ -151,7 +161,9 @@ export abstract class Character extends Phaser.Physics.Arcade.Sprite {
         this.setTint(0xff0000);
         this._healthState = Status.DAMAGED;
         this._damageTime = 0;
-        this._hp = this._hp-1;
+        this._hp = this._hp - damage;
+
+        this._healthBar.draw(this._hp);
 
         if(this._hp <= 0){
             this._healthState = Status.DEAD
@@ -174,5 +186,16 @@ export abstract class Character extends Phaser.Physics.Arcade.Sprite {
         this._skills['int'] = int;
         this._skills['wis'] = wis;
         this._skills['cha'] = cha;
+
+        if(this._skills['str'] > this._skills['dex'])
+            this._damage = this._skills['str'];
+        else
+            this._damage = this._skills['dex'];
+
+        this._MAX_HP = this._skills['con'] * 10;
+        this._speed = this._skills['dex'] + 100;
+
+        this._healthBar= new HealthBar(this.scene, this.x - 10, (this.y - this.height - 2), this._MAX_HP, this.width);
+        
     }
 }

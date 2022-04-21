@@ -8,15 +8,16 @@ import Thief from '../enemies/Thief'
 import '../characters/Lilith';
 import Lilith from '../characters/Lilith';
 import { sceneEvents } from '~/events/EventManager';
+import { HealthBar } from '~/utils/Healthbar';
 
 export default class World01 extends Phaser.Scene
 {
-    private thiefLiliColl! : Phaser.Physics.Arcade.Collider
+    private thiefLiliColl! : Phaser.Physics.Arcade.Collider;
     private cursors! : Phaser.Types.Input.Keyboard.CursorKeys;
     
     private lilith! : Lilith;
-    private knives! : Phaser.Physics.Arcade.Group
-    private thieves! : Phaser.Physics.Arcade.Group
+    private knives! : Phaser.Physics.Arcade.Group;
+    private thieves! : Phaser.Physics.Arcade.Group;
 
 	constructor()
 	{
@@ -57,8 +58,8 @@ export default class World01 extends Phaser.Scene
         //Añadir los objetos al mapa y activar las colisiones de los mismos
 
         this.lilith = this.add.Lilith(48, 48, 'Lilith');
-        this.lilith.setWeapon(this.knives)
-        
+        this.lilith.setWeapon(this.knives);
+
         this.thieves = this.physics.add.group({
             classType: Thief,
             createCallback: (go)=>{
@@ -75,6 +76,7 @@ export default class World01 extends Phaser.Scene
         this.thiefLiliColl = this.physics.add.collider(this.thieves, this.lilith, this.onThiefCollision, undefined, this);
         this.cameras.main.startFollow(this.lilith, true, 1, 1);
         this.cameras.main.centerOn(this.lilith.x, this.lilith.y);
+        this.cameras.main.zoom = 3;
 
     }
 
@@ -90,7 +92,7 @@ export default class World01 extends Phaser.Scene
         var thief = obj1 as Thief;
         this.knives.killAndHide(knife);
 
-        thief.onHit();
+        thief.onHit(this.lilith.damage());
 
         knife.destroy();
     }
@@ -104,12 +106,15 @@ export default class World01 extends Phaser.Scene
 
         const dir = new Phaser.Math.Vector2(dx,dy).normalize().scale(200);
 
-        this.lilith.onHit(dir);
+        this.lilith.onHit(dir, enemy.damage());
+        enemy.onPlayerCollision(dir);
         sceneEvents.emit('player-took-damage', this.lilith.hp())
 
         if(this.lilith.hp()<=0){
             this.thiefLiliColl?.destroy();
         }
+
+
 
     }
 
@@ -117,6 +122,12 @@ export default class World01 extends Phaser.Scene
 
         if (this.lilith){
             this.lilith.update(this.cursors);
+        }
+
+        if (this.thieves.children){
+            this.thieves.getChildren().forEach((thief)=>{
+                thief.update();
+            })
         }
 
     }

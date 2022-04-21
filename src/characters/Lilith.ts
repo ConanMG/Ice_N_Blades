@@ -17,6 +17,8 @@ export default class Lilith extends Character {
     constructor(scene:Phaser.Scene, x:number, y:number, texture: string, frame?:string|number){
         super(scene,x,y,texture,frame);
         this._healthState=Status.HEALTHY
+        this.setupSkills(7, 14, 12, 16, 15, 18)
+        this._hp = this._MAX_HP;
 
         this.anims.play("idle");
     }
@@ -92,7 +94,7 @@ export default class Lilith extends Character {
 
         if(this._healthState === Status.DEAD){
             this.setVelocity(0, 0);
-            this.anims.play('death', true)
+            this.anims.play('death', true);
             this.on("animationcomplete", ()=>{
                 this._gameOver = true;
                 this.destroy();
@@ -107,26 +109,30 @@ export default class Lilith extends Character {
 
         if (cursors.left.isDown) {
             this.setFlipX(false)
-            this.setVelocityX(-150);
+            this.setVelocityX(-this._speed);
             this.setVelocityY(0);
+            this._healthBar.updatePosition(this.x - 10, (this.y - this.height - 2))
             this.anims.play('left', true);
             this._lastDirection = this.anims.currentAnim.key;
         } else if (cursors.right.isDown) {
             this.setFlipX(false)
-            this.setVelocityX(150);
+            this.setVelocityX(this._speed);
             this.setVelocityY(0);
+            this._healthBar.updatePosition(this.x - 10, (this.y - this.height - 2))
             this.anims.play('right', true);
             this._lastDirection = this.anims.currentAnim.key;
         }else if (cursors.down.isDown) {
             this.setFlipX(false)
-            this.setVelocityY(150);
+            this.setVelocityY(this._speed);
             this.setVelocityX(0);
+            this._healthBar.updatePosition(this.x - 10, (this.y - this.height - 2))
             this.anims.play('down', true);
             this._lastDirection = this.anims.currentAnim.key;
         }else if (cursors.up.isDown) {
             this.setFlipX(false)
-            this.setVelocityY(-150);
+            this.setVelocityY(-this._speed);
             this.setVelocityX(0);
+            this._healthBar.updatePosition(this.x - 10, (this.y - this.height - 2))
             this.anims.play('up', true);
             this._lastDirection = this.anims.currentAnim.key;
         } else {

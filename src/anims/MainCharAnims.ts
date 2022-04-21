@@ -7,7 +7,7 @@ const createMainCharAnims = (anims: Phaser.Animations.AnimationManager)=>{
         {
             key: 'idle',
             frames: anims.generateFrameNames('Lilith', { prefix: 'Idle', end: 3, zeroPad: 4 }),
-            frameRate: 5,
+            frameRate: 6,
             repeat: -1
         }
     );
@@ -15,7 +15,7 @@ const createMainCharAnims = (anims: Phaser.Animations.AnimationManager)=>{
         {
             key: 'left',
             frames: anims.generateFrameNames('Lilith', { prefix: 'Left', end: 7, zeroPad: 4 }),
-            frameRate: 10,
+            frameRate: 12,
             repeat: -1
         }
     );
@@ -23,7 +23,7 @@ const createMainCharAnims = (anims: Phaser.Animations.AnimationManager)=>{
         {
             key: 'right',
             frames: anims.generateFrameNames('Lilith', { prefix: 'Right', end: 7, zeroPad: 4 }),
-            frameRate: 10,
+            frameRate: 12,
             repeat: -1
         }
     );
@@ -31,7 +31,7 @@ const createMainCharAnims = (anims: Phaser.Animations.AnimationManager)=>{
         {
             key: 'up',
             frames: anims.generateFrameNames('Lilith', { prefix: 'Up', end: 8, zeroPad: 4 }),
-            frameRate: 10,
+            frameRate: 12,
             repeat: -1
         }
     );
@@ -39,7 +39,7 @@ const createMainCharAnims = (anims: Phaser.Animations.AnimationManager)=>{
         {
             key: 'down',
             frames: anims.generateFrameNames('Lilith', { prefix: 'Down', end: 7, zeroPad: 4 }),
-            frameRate: 10,
+            frameRate: 12,
             repeat: -1
         }
     );
@@ -47,7 +47,7 @@ const createMainCharAnims = (anims: Phaser.Animations.AnimationManager)=>{
         {
             key: 'hurt',
             frames: anims.generateFrameNames('Lilith', { prefix: 'Hurt', end: 3, zeroPad: 4 }),
-            frameRate: 10,
+            frameRate: 6,
             repeat: 0
         }
     );
@@ -55,7 +55,7 @@ const createMainCharAnims = (anims: Phaser.Animations.AnimationManager)=>{
         {
             key: 'death',
             frames: anims.generateFrameNames('Lilith', { prefix: 'Death', end: 6, zeroPad: 4 }),
-            frameRate: 10,
+            frameRate: 12,
             repeat: 0
         }
     );
