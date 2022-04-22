@@ -22,30 +22,27 @@ export class HealthBar {
         this.x = x;
         this.y = y;
         this.currentValue = this.fullHealth;
-        this.draw(fullHealth);
+        this.draw(this.x, this.y, fullHealth);
 
         scene.add.existing(this._bar);
     }
 
-    updatePosition(x: number, y: number){
-        this.x = x
-        this.y = y
-
-        this.draw(this.currentValue)
+    expandHealth(newHp: number){
+        this.fullHealth = newHp;
     }
 
-    draw (hpLeft: number)
+    draw (x:number, y:number, hpLeft: number)
     {
         this._bar.clear();
 
         //  BG
         this._bar.fillStyle(0x000000);
-        this._bar.fillRect(this.x, this.y, this.barLength + 4, 7);
+        this._bar.fillRect(x, y, this.barLength + 4, 7);
 
         //  Health
 
         this._bar.fillStyle(0xffffff);
-        this._bar.fillRect(this.x + 2, this.y + 2, this.barLength, 3);
+        this._bar.fillRect(x + 2, y + 2, this.barLength, 3);
 
         if (hpLeft < (this.fullHealth/4))
         {
@@ -58,7 +55,7 @@ export class HealthBar {
 
         this.currentValue = (hpLeft * this.barLength) / this.fullHealth
 
-        this._bar.fillRect(this.x + 2, this.y + 2, this.currentValue, 3);
+        this._bar.fillRect(x + 2, y + 2, this.currentValue, 3);
     }
 
 }

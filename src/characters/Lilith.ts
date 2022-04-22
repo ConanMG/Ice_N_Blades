@@ -12,7 +12,6 @@ declare global{
 
 export default class Lilith extends Character {
 
-    private _lastDirection!: string;
 
     constructor(scene:Phaser.Scene, x:number, y:number, texture: string, frame?:string|number){
         super(scene,x,y,texture,frame);
@@ -80,81 +79,14 @@ export default class Lilith extends Character {
     }
 
     update(cursors: Phaser.Types.Input.Keyboard.CursorKeys) {
-
-        if (this._gameOver){
-            return;
-        }
-
-        this.checkXp();
-        
-        if(this._healthState === Status.DAMAGED){
-            this.anims.play('hurt', true);
-            return;
-        }
-
-        if(this._healthState === Status.DEAD){
-            this.setVelocity(0, 0);
-            this.anims.play('death', true);
-            this.on("animationcomplete", ()=>{
-                this._gameOver = true;
-                this.destroy();
-            })
-            return
-        }
+        super.update(cursors);
 
         if(Phaser.Input.Keyboard.JustDown(cursors.space)){
             this.attack();
             return
         }
-
-        if (cursors.left.isDown) {
-            this.setFlipX(false)
-            this.setVelocityX(-this._speed);
-            this.setVelocityY(0);
-            this._healthBar.updatePosition(this.x - 10, (this.y - this.height - 2))
-            this.anims.play('left', true);
-            this._lastDirection = this.anims.currentAnim.key;
-        } else if (cursors.right.isDown) {
-            this.setFlipX(false)
-            this.setVelocityX(this._speed);
-            this.setVelocityY(0);
-            this._healthBar.updatePosition(this.x - 10, (this.y - this.height - 2))
-            this.anims.play('right', true);
-            this._lastDirection = this.anims.currentAnim.key;
-        }else if (cursors.down.isDown) {
-            this.setFlipX(false)
-            this.setVelocityY(this._speed);
-            this.setVelocityX(0);
-            this._healthBar.updatePosition(this.x - 10, (this.y - this.height - 2))
-            this.anims.play('down', true);
-            this._lastDirection = this.anims.currentAnim.key;
-        }else if (cursors.up.isDown) {
-            this.setFlipX(false)
-            this.setVelocityY(-this._speed);
-            this.setVelocityX(0);
-            this._healthBar.updatePosition(this.x - 10, (this.y - this.height - 2))
-            this.anims.play('up', true);
-            this._lastDirection = this.anims.currentAnim.key;
-        } else {
-            this.setVelocityX(0);
-            this.setVelocityY(0);
-
-            switch(this._lastDirection){
-                case 'right' || 'up':
-                    this.setFlipX(false)
-                    break;
-                case 'left' || 'down':
-                    this.setFlipX(true)
-                    break;
-                default:
-                    this.setFlipX(false)
-                    break;
-            }
-
-            this.play('idle', true)
-        }
-        
     }
+
 
 }
 

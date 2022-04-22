@@ -94,6 +94,10 @@ export default class World01 extends Phaser.Scene
 
         thief.onHit(this.lilith.damage());
 
+        sceneEvents.on('enemy-killed', (xpAmount: number)=>{
+            this.lilith.setXp(xpAmount);
+        }, this)
+
         knife.destroy();
     }
 

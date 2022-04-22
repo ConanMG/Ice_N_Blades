@@ -1,5 +1,6 @@
 import Phaser, { Physics } from 'phaser';
 import { Character } from '~/characters/Character';
+import { sceneEvents } from '~/events/EventManager';
 import { Direction, Status } from '~/utils/Predet';
 import { Enemy } from './Enemies';
 
@@ -21,6 +22,7 @@ export default class Thief extends Enemy {
     constructor(scene: Phaser.Scene, x:number, y:number, texture:string, frame?:string | number){
         super(scene, x, y, texture, frame);
         this.setupStats(12, 16, 10, 8, 6, 14);
+        this._xpDrop = Math.random() * 14;
 
         this.anims.play('thief_idle');
         this._healthState = Status.HEALTHY;

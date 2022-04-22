@@ -11,7 +11,7 @@ const config: Phaser.Types.Core.GameConfig = {
 		default: 'arcade',
 		arcade: {
 			fixedStep: false,
-			debug: true
+			debug: false
 		}
 	},
 	scene: [Preloader_World01, World01, World01_UI],

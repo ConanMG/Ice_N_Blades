@@ -1,4 +1,5 @@
 import Phaser from "phaser";
+import { sceneEvents } from "~/events/EventManager";
 import { Direction, Status } from "~/utils/Predet";
 
 export abstract class Enemy extends Phaser.Physics.Arcade.Sprite {
@@ -7,13 +8,14 @@ export abstract class Enemy extends Phaser.Physics.Arcade.Sprite {
     protected _healthState!: Status;
     protected _speed!: number;
     protected _damage!: number;
-    protected _direction!: Direction
-    protected _stats!: Map<string, number>
+    protected _direction!: Direction;
+    protected _stats!: Map<string, number>;
+    protected _xpDrop!: number;
 
     protected _target!: Phaser.GameObjects.Components.Transform;
     protected _aggro: boolean = false;
-    protected _moveEvent!: Phaser.Time.TimerEvent
-    protected _hitEvent!: Phaser.Time.TimerEvent
+    protected _moveEvent!: Phaser.Time.TimerEvent;
+    protected _hitEvent!: Phaser.Time.TimerEvent;
     protected _detectionRange!: number;
 
     protected _justHit!: boolean;
@@ -81,6 +83,7 @@ export abstract class Enemy extends Phaser.Physics.Arcade.Sprite {
         this._hp = this._hp - damage;
 
         if(this._hp <= 0){
+            sceneEvents.emit('enemy-killed', this._xpDrop);
             this._healthState = Status.DEAD;
         }
     }
@@ -96,7 +99,8 @@ export abstract class Enemy extends Phaser.Physics.Arcade.Sprite {
             callback: ()=>{
                 this.continueChase();
             },
-            loop:false
+            loop: false,
+            repeatCount: 5
         })
 
     }

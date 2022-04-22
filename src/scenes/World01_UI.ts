@@ -1,51 +1,30 @@
 import Phaser from "phaser";
 
 import { sceneEvents } from "~/events/EventManager";
+import { HealthBar } from "~/utils/Healthbar";
 
 export default class World01_UI extends Phaser.Scene{
 
-    private hearts !: Phaser.GameObjects.Group
+    private level: number;
+    private characterHealth!: HealthBar;
 
     constructor(){
         super({'key':'World01_UI'});
+
+        this.level = 1;
     }
 
     create(){
-        this.hearts = this.add.group({
-            classType: Phaser.GameObjects.Image
-        })
-
-        this.hearts.createMultiple({
-            key: 'heartFull',
-            setXY:{
-                x:20,
-                y:20,
-                stepX:40,
-            },
-            quantity:3,
-            setScale:{
-                x:3,
-                y:3
-            }
-        })
         
-        sceneEvents.on('player-took-damage', this.playerHealthDecreased, this)
+        let txtName = this.add.text(10, 10, 'Lilith', { font: '48px Volantis', color:'#FFFFFF'});
+        let txtLevel = this.add.text(10, 48, `Level: ${this.level}`, { font: '24px Volantis', color:'#FFFFFF'});
+        let txtWorld = this.add.text(10, 82, 'World01', { font: '48px Volantis', color:'#FFFFFF'});
 
-        sceneEvents.on(Phaser.Scenes.Events.SHUTDOWN, ()=>{
-            sceneEvents.off('player-took-damage', this.playerHealthDecreased, this)
-        })
-    }
+        sceneEvents.on('player-leveled-up', ()=>{
+            this.level += 1;
 
-    private playerHealthDecreased(health:number){
-        this.hearts.children.each((go, i) =>{
-            const heart = go as Phaser.GameObjects.Image
-            if(i < health){
-                heart.setTexture('heartFull')
-            }
-            else{
-                heart.setTexture('heartEmpty')
-            }
-        })
+            txtLevel.setText(`Level: ${this.level}`)
+        }, this)        
     }
 
 }
