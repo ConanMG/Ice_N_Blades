@@ -1,4 +1,5 @@
 import Phaser from "phaser";
+import ICaster from "~/interfaces/ICaster";
 import { Status } from "~/utils/Predet"
 import { Character } from "./Character";
 
@@ -10,40 +11,68 @@ declare global{
     }
 }
 
-export default class Lilith extends Character {
+export default class Lilith extends Character implements ICaster {
 
+    Cooldown!: number;
+    spells!: String[];
 
     constructor(scene:Phaser.Scene, x:number, y:number, texture: string, frame?:string|number){
         super(scene,x,y,texture,frame);
+
         this._healthState=Status.HEALTHY
-        this.setupSkills(7, 14, 12, 16, 15, 18)
+        
+        this.setupSkills(7, 14, 12, 16, 15, 18);
+        this.spells = new Array<string>();
+        this.setSpellsPerInt();
         this._hp = this._MAX_HP;
+        this._ac = 11;
 
         this.anims.play("idle");
     }
 
-    preUpdate(time: number, delta: number) {
+    checkCooldown() {
+        return this.Cooldown
+    }
+    castSpell(spellKey: string) {
+        throw new Error("Method not implemented.");
+    }
+    recoverSpells() {
+        throw new Error("Method not implemented.");
+    }
 
-        super.preUpdate(time, delta);
-
-        switch(this._healthState){
-            case Status.HEALTHY:
-            break;
-            case Status.DAMAGED:
-                this._damageTime += delta;
-                if(this._damageTime >= 150){
-                    this._healthState = Status.HEALTHY;
-                    this.setTint(0xffffff);
-                    this._damageTime = 0;
-                }
-            break;
-            case Status.DEAD:
-                this.setTint(0xffffff);
-            break;
+    setSpellsPerInt(){
+        if(this._skills['int'] >= 10){
+            if(!this.spells.includes('Misty Step'))
+                this.spells.push('Misty Step')
+        }
+        if(this._skills['int'] >= 12){
+            if(!this.spells.includes('Hellish Rebuke'))
+                this.spells.push('Hellish Rebuke')
+        }
+        if(this._skills['int'] >= 14){
+            if(!this.spells.includes('Fire Ball'))
+                this.spells.push('Fire Ball')
+        }
+        if(this._skills['int'] >= 16){
+            if(!this.spells.includes('Phantasmal Form'))
+                this.spells.push('Phantasmal Form')
+        }
+        if(this._skills['int'] >= 18){
+            if(!this.spells.includes('Blur'))
+                this.spells.push('Blur')
+        }
+        if(this._skills['int'] >= 20){
+            if(!this.spells.includes('Power Word: Death'))
+                this.spells.push('Power Word: Death')
         }
     }
 
-    private attack(){
+    raiseSkill(skill: string) {
+        super.raiseSkill(skill);
+        this.setSpellsPerInt();
+    }
+
+    attack(){
 
         if(!this._weapon){
             return
@@ -76,6 +105,27 @@ export default class Lilith extends Character {
 
         knife.setRotation(angle)
         knife.setVelocity(vec.x * 300, vec.y *300)
+    }
+
+    preUpdate(time: number, delta: number) {
+
+        super.preUpdate(time, delta);
+
+        switch(this._healthState){
+            case Status.HEALTHY:
+            break;
+            case Status.DAMAGED:
+                this._damageTime += delta;
+                if(this._damageTime >= 150){
+                    this._healthState = Status.HEALTHY;
+                    this.setTint(0xffffff);
+                    this._damageTime = 0;
+                }
+            break;
+            case Status.DEAD:
+                this.setTint(0xffffff);
+            break;
+        }
     }
 
     update(cursors: Phaser.Types.Input.Keyboard.CursorKeys) {

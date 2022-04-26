@@ -19,10 +19,12 @@ const randomDirection = (exclude:Direction)=>{
 
 export default class Thief extends Enemy {
 
+    private _moveEvent!: Phaser.Time.TimerEvent;
+
     constructor(scene: Phaser.Scene, x:number, y:number, texture:string, frame?:string | number){
         super(scene, x, y, texture, frame);
-        this.setupStats(12, 16, 10, 8, 6, 14);
-        this._xpDrop = Math.random() * 14;
+        this.setupStats(11, 12, 12, 10, 10, 10);
+        this._ac = 12;
 
         this.anims.play('thief_idle');
         this._healthState = Status.HEALTHY;
@@ -72,15 +74,17 @@ export default class Thief extends Enemy {
                 this.anims.play('thief_hurt', true);
                 this.on('animationcomplete', ()=>{
                     this._healthState = Status.HEALTHY;
+                    this.anims.play('thief_run', true);
+                    this._moveEvent;
                 })
                 return;
             case Status.DEAD:
-                this.setVelocity(0)
-                this.anims.play('thief_death', true)
+                this.setVelocity(0);
+                this.anims.play('thief_death', true);
                 this.on("animationcomplete", ()=>{
                     this._gameOver = true;
-                    this.destroy()
-                })
+                    this.destroy();
+                });
                 return;
         }
     

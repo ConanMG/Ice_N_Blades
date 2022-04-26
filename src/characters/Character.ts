@@ -14,7 +14,6 @@ export abstract class Character extends Phaser.Physics.Arcade.Sprite {
     protected _ac!: number;
     protected _gameOver!: boolean;
     protected _damage!: number;
-    protected _spells: Array<string> = new Array<string>();
 
     protected _weapon!: Phaser.Physics.Arcade.Group
 
@@ -137,7 +136,6 @@ export abstract class Character extends Phaser.Physics.Arcade.Sprite {
             case 'int':
                 this._skills['int']++;
                 this._skillPoints--;
-                this.setSpellsPerInt();
                 break;
             case 'wis':
                 this._skills['wis']++;
@@ -177,7 +175,7 @@ export abstract class Character extends Phaser.Physics.Arcade.Sprite {
         this.setTint(0xff0000);
         this._healthState = Status.DAMAGED;
         this._damageTime = 0;
-        this._hp = this._hp - damage;
+        this._hp = this._hp - (damage - (this._ac / 2));
 
         this._healthBar.draw(this.x - 12.5, this.y - 15, this._hp)
 
@@ -207,8 +205,6 @@ export abstract class Character extends Phaser.Physics.Arcade.Sprite {
         
         this._MAX_HP = this._skills['con'] * 10;
 
-        this.setSpellsPerInt()
-
         this._healthBar = new HealthBar(this.scene, this.x - 10, (this.y - this.height - 2), this._MAX_HP, this.width);
 
     }
@@ -222,33 +218,6 @@ export abstract class Character extends Phaser.Physics.Arcade.Sprite {
             
         this._speed = this._skills['dex'] + 100;
 
-    }
-
-    setSpellsPerInt(){
-        if(this._skills['int'] >= 10){
-            if(!this._spells.includes('Misty Step'))
-                this._spells.push('Misty Step')
-        }
-        if(this._skills['int'] >= 12){
-            if(!this._spells.includes('Blur'))
-                this._spells.push('Blur')
-        }
-        if(this._skills['int'] >= 14){
-            if(!this._spells.includes('Fire Ball'))
-                this._spells.push('Fire Ball')
-        }
-        if(this._spells['int'] >= 16){
-            if(!this._spells.includes('Phantasmal Form'))
-                this._spells.push('Phantasmal Form')
-        }
-        if(this._skills['int'] >= 18){
-            if(!this._spells.includes('Blur'))
-                this._spells.push('Blur')
-        }
-        if(this._skills['int'] >= 20){
-            if(!this._spells.includes('Power Word: Death'))
-                this._spells.push('Power Word: Death')
-        }
     }
 
     update(cursors: Phaser.Types.Input.Keyboard.CursorKeys) {

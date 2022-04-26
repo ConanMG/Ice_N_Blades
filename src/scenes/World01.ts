@@ -1,7 +1,7 @@
 import Phaser from 'phaser'
 
-import { createMainCharAnims } from '../anims/MainCharAnims';
-import { createThiefAnims } from '../anims/EnemyAnims'
+import { createMainCharAnims } from '../anims/LilithAnims';
+import { createThiefAnims } from '../anims/ThiefAnims'
 import { debugCollisions } from '../utils/debug'
 
 import Thief from '../enemies/Thief'
@@ -115,6 +115,7 @@ export default class World01 extends Phaser.Scene
         sceneEvents.emit('player-took-damage', this.lilith.hp())
 
         if(this.lilith.hp()<=0){
+            sceneEvents.emit('player-died')
             this.thiefLiliColl?.destroy();
         }
 
