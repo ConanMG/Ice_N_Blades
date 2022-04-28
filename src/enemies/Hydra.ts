@@ -1,7 +1,21 @@
 import Phaser from "phaser";
+import IBoss from "~/interfaces/IBoss";
+import { Direction } from "~/utils/Predet";
 import { Enemy } from "./Enemies";
 
-export default class Hydra extends Enemy{
+const movementPattern = (exclude:Direction)=>{
+
+    let newDirection = Phaser.Math.Between(0,4);
+
+    while(newDirection === exclude){
+
+        newDirection = Phaser.Math.Between(0,4);
+
+    }
+    
+    return newDirection;
+}
+export default class Hydra extends Enemy implements IBoss{
     
     private regenEvent: Phaser.Time.TimerEvent;
 
@@ -17,6 +31,10 @@ export default class Hydra extends Enemy{
             },
             loop: true
         });
+    }
+    
+    activateBossSkill() {
+        throw new Error("Method not implemented.");
     }
 
     preUpdate(time: number, delta: number) {

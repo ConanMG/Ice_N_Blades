@@ -9,6 +9,7 @@ import '../characters/Lilith';
 import Lilith from '../characters/Lilith';
 import { sceneEvents } from '~/events/EventManager';
 import { HealthBar } from '~/utils/Healthbar';
+import { Enemy } from '~/enemies/Enemies';
 
 export default class World01 extends Phaser.Scene
 {
@@ -18,6 +19,7 @@ export default class World01 extends Phaser.Scene
     private lilith! : Lilith;
     private knives! : Phaser.Physics.Arcade.Group;
     private thieves! : Phaser.Physics.Arcade.Group;
+    private enemySpawner!: Phaser.Time.TimerEvent;
 
 	constructor()
 	{
@@ -67,13 +69,20 @@ export default class World01 extends Phaser.Scene
                 thief.body.onCollide = true;
             }
         })
-        this.thieves.get(this.scale.width*0.3, this.scale.height*0.3,'Thief').setTarget(this.lilith)
+        
+        this.enemySpawner = this.time.addEvent({
+            delay: 10000,
+            callback: () => {
+                this.thieves.get(this.scale.width*0.3, this.scale.height*0.3,'Thief').setTarget(this.lilith)
+            },
+            loop: true
+        })
 
         this.physics.add.collider(this.lilith, walls);
         this.physics.add.collider(this.thieves, walls);
         this.physics.add.collider(this.knives, walls, this.onKnifeWallCollision, undefined, this)
-        this.physics.add.collider(this.thieves, this.knives, this.onKnifeThiefCollision, undefined, this)
-        this.thiefLiliColl = this.physics.add.collider(this.thieves, this.lilith, this.onThiefCollision, undefined, this);
+        this.physics.add.collider(this.thieves, this.knives, this.onKnifeEnemyCollision, undefined, this)
+        this.thiefLiliColl = this.physics.add.collider(this.thieves, this.lilith, this.onEnemyCollision, undefined, this);
         this.cameras.main.startFollow(this.lilith, true, 1, 1);
         this.cameras.main.centerOn(this.lilith.x, this.lilith.y);
         this.cameras.main.zoom = 3;
@@ -87,12 +96,12 @@ export default class World01 extends Phaser.Scene
         knife.destroy();
     }
 
-    private onKnifeThiefCollision(obj1: Phaser.GameObjects.GameObject, knife: Phaser.GameObjects.GameObject){
+    private onKnifeEnemyCollision(obj1: Phaser.GameObjects.GameObject, knife: Phaser.GameObjects.GameObject){
         
-        var thief = obj1 as Thief;
+        var enemy = obj1 as Enemy;
         this.knives.killAndHide(knife);
 
-        thief.onHit(this.lilith.damage());
+        enemy.onHit(this.lilith.damage());
 
         sceneEvents.on('enemy-killed', (xpAmount: number)=>{
             this.lilith.setXp(xpAmount);
@@ -101,9 +110,9 @@ export default class World01 extends Phaser.Scene
         knife.destroy();
     }
 
-    private onThiefCollision(player:Phaser.GameObjects.GameObject, attacker:Phaser.GameObjects.GameObject){
+    private onEnemyCollision(player:Phaser.GameObjects.GameObject, attacker:Phaser.GameObjects.GameObject){
         
-        const enemy = attacker as Thief;
+        const enemy = attacker as Enemy;
  
         const dx = this.lilith.x - enemy.x
         const dy = this.lilith.y - enemy.y

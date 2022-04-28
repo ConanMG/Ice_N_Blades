@@ -36,6 +36,22 @@ const createSkeletonAnims = (anims: Phaser.Animations.AnimationManager)=>{
     );
     anims.create(
         {
+            key: 'skeleton_crumble',
+            frames: anims.generateFrameNames('Skeleton', { prefix: 'Crumble', end: 2, zeroPad: 4 }),
+            frameRate: 12,
+            repeat: 0
+        }
+    );
+    anims.create(
+        {
+            key: 'skeleton_rise',
+            frames: anims.generateFrameNames('Skeleton', { prefix: 'Rise', end: 2, zeroPad: 4 }),
+            frameRate: 12,
+            repeat: 0
+        }
+    );
+    anims.create(
+        {
             key: 'skeleton_death',
             frames: anims.generateFrameNames('Skeleton', { prefix: 'Death', end: 4, zeroPad: 4 }),
             frameRate: 12,

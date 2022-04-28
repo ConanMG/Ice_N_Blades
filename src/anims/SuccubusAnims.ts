@@ -20,6 +20,14 @@ const createSuccubusAnims = (anims: Phaser.Animations.AnimationManager)=>{
     );
     anims.create(
         {
+            key: 'succubus_draining_kiss',
+            frames: anims.generateFrameNames('Succubus', { prefix: 'DrainingKiss', end: 7, zeroPad: 4 }),
+            frameRate: 12,
+            repeat: 0
+        }
+    );
+    anims.create(
+        {
             key: 'succubus_charm',
             frames: anims.generateFrameNames('Succubus', { prefix: 'Charm', end: 7, zeroPad: 4 }),
             frameRate: 12,

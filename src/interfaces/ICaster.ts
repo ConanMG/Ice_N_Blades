@@ -2,13 +2,11 @@ import Phaser from "phaser";
 
 export default interface ICaster {
 
-    Cooldown: number;
-    spells: Array<String>
+    cooldown: number;
+    spells: Array<String>;
 
-    checkCooldown();
+    cooldownTimer: Phaser.Time.TimerEvent;
 
     castSpell(spellKey: string);
-
-    recoverSpells();
 
 }

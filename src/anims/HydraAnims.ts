@@ -20,6 +20,14 @@ const createHydraAnims = (anims: Phaser.Animations.AnimationManager)=>{
     );
     anims.create(
         {
+            key: 'hydra_regen',
+            frames: anims.generateFrameNames('Hydra', { prefix: 'Regen', end: 4, zeroPad: 4 }),
+            frameRate: 12,
+            repeat: 0
+        }
+    );
+    anims.create(
+        {
             key: 'hydra_bite',
             frames: anims.generateFrameNames('Hydra', { prefix: 'Bite', end: 4, zeroPad: 4 }),
             frameRate: 12,

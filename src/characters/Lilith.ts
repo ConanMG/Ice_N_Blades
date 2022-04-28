@@ -13,8 +13,9 @@ declare global{
 
 export default class Lilith extends Character implements ICaster {
 
-    Cooldown!: number;
+    cooldown!: number;
     spells!: String[];
+    cooldownTimer!: Phaser.Time.TimerEvent;
 
     constructor(scene:Phaser.Scene, x:number, y:number, texture: string, frame?:string|number){
         super(scene,x,y,texture,frame);
@@ -30,13 +31,7 @@ export default class Lilith extends Character implements ICaster {
         this.anims.play("idle");
     }
 
-    checkCooldown() {
-        return this.Cooldown
-    }
     castSpell(spellKey: string) {
-        throw new Error("Method not implemented.");
-    }
-    recoverSpells() {
         throw new Error("Method not implemented.");
     }
 

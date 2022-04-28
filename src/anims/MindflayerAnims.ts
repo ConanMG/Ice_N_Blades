@@ -28,6 +28,14 @@ const createMindflayerAnims = (anims: Phaser.Animations.AnimationManager)=>{
     );
     anims.create(
         {
+            key: 'mindflayer_extract_brain',
+            frames: anims.generateFrameNames('Mindflayer', { prefix: 'ExtractBrain', end: 2, zeroPad: 4 }),
+            frameRate: 12,
+            repeat: 0
+        }
+    );
+    anims.create(
+        {
             key: 'mindflayer_psychic_beam',
             frames: anims.generateFrameNames('Mindflayer', { prefix: 'PhsychicBeam', end: 2, zeroPad: 4 }),
             frameRate: 12,
