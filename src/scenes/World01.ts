@@ -10,16 +10,25 @@ import Lilith from '../characters/Lilith';
 import { sceneEvents } from '~/events/EventManager';
 import { HealthBar } from '~/utils/Healthbar';
 import { Enemy } from '~/enemies/Enemies';
+import Skeleton from '~/enemies/Skeleton';
+import { createSkeletonAnims } from '~/anims/SkeletonAnims';
+import { runInThisContext } from 'vm';
 
 export default class World01 extends Phaser.Scene
 {
     private thiefLiliColl! : Phaser.Physics.Arcade.Collider;
+    private skeletonLiliColl! : Phaser.Physics.Arcade.Collider;
     private cursors! : Phaser.Types.Input.Keyboard.CursorKeys;
     
-    private lilith! : Lilith;
+    private character! : Lilith;
     private knives! : Phaser.Physics.Arcade.Group;
     private thieves! : Phaser.Physics.Arcade.Group;
+    private skeletons! : Phaser.Physics.Arcade.Group;
+    
     private enemySpawner!: Phaser.Time.TimerEvent;
+    private waveLength: number = 10;
+    private wave: number = 1;
+    private count: number = 0;
 
 	constructor()
 	{
@@ -40,6 +49,7 @@ export default class World01 extends Phaser.Scene
 
         createMainCharAnims(this.anims);
         createThiefAnims(this.anims);
+        createSkeletonAnims(this.anims);
 
         //Mapa
 
@@ -59,8 +69,8 @@ export default class World01 extends Phaser.Scene
 
         //Añadir los objetos al mapa y activar las colisiones de los mismos
 
-        this.lilith = this.add.Lilith(48, 48, 'Lilith');
-        this.lilith.setWeapon(this.knives);
+        this.character = this.add.Lilith(48, 48, 'Lilith');
+        this.character.setWeapon(this.knives);
 
         this.thieves = this.physics.add.group({
             classType: Thief,
@@ -69,23 +79,71 @@ export default class World01 extends Phaser.Scene
                 thief.body.onCollide = true;
             }
         })
+
+        this.skeletons = this.physics.add.group({
+            classType: Skeleton,
+            createCallback: (go)=>{
+                const skeleton = go as Skeleton;
+                skeleton.body.onCollide = true;
+            }
+        })
+
+        //this.skeletons.get(this.scale.width*0.3, this.scale.height*0.3,'Skeleton').setTarget(this.character)
         
         this.enemySpawner = this.time.addEvent({
-            delay: 10000,
+            delay: 1000,
             callback: () => {
-                this.thieves.get(this.scale.width*0.3, this.scale.height*0.3,'Thief').setTarget(this.lilith)
+                this.count++;
+                console.log(this.count);
+                switch (Math.round(Math.random() * 2)){
+                    case 1:
+                        this.thieves.get(this.scale.width * Math.random(), this.scale.height * Math.random(),'Thief').setTarget(this.character)
+                        break;
+                    case 2:
+                        this.skeletons.get(this.scale.width * Math.random(), this.scale.height * Math.random(),'Skeleton').setTarget(this.character)
+                        break;
+                    case 3:
+                        break;
+                    case 4:
+                        break;
+                    case 5:
+                        break;
+                    case 6:
+                        break;
+                    case 7:
+                        break;
+                    case 8:
+                        break;
+                    default:
+                        break;
+                }
+                if(this.count === this.waveLength){
+                    this.enemySpawner.paused = true;
+                    this.time.addEvent({
+                        delay: 30000,
+                        callback: () => {
+                            this.count = 0;
+                            this.waveLength = this.waveLength * 2;
+                            this.enemySpawner.paused = false;
+                        },
+                        loop: false
+                    })
+                }
             },
             loop: true
         })
 
-        this.physics.add.collider(this.lilith, walls);
+        this.physics.add.collider(this.character, walls);
         this.physics.add.collider(this.thieves, walls);
-        this.physics.add.collider(this.knives, walls, this.onKnifeWallCollision, undefined, this)
-        this.physics.add.collider(this.thieves, this.knives, this.onKnifeEnemyCollision, undefined, this)
-        this.thiefLiliColl = this.physics.add.collider(this.thieves, this.lilith, this.onEnemyCollision, undefined, this);
-        this.cameras.main.startFollow(this.lilith, true, 1, 1);
-        this.cameras.main.centerOn(this.lilith.x, this.lilith.y);
-        this.cameras.main.zoom = 3;
+        this.physics.add.collider(this.skeletons, walls);
+        this.physics.add.collider(this.knives, walls, this.onKnifeWallCollision, undefined, this);
+        this.physics.add.collider(this.thieves, this.knives, this.onKnifeEnemyCollision, undefined, this);
+        this.physics.add.collider(this.skeletons, this.knives, this.onKnifeEnemyCollision, undefined, this);
+        this.thiefLiliColl = this.physics.add.collider(this.thieves, this.character, this.onEnemyHit, undefined, this);
+        this.skeletonLiliColl = this.physics.add.collider(this.skeletons, this.character, this.onEnemyHit, undefined, this);
+        //this.cameras.main.startFollow(this.character, true, 1, 1);
+        //this.cameras.main.centerOn(this.character.x, this.character.y);
+        //this.cameras.main.zoom = 3;
 
     }
 
@@ -101,29 +159,31 @@ export default class World01 extends Phaser.Scene
         var enemy = obj1 as Enemy;
         this.knives.killAndHide(knife);
 
-        enemy.onHit(this.lilith.damage());
+        enemy.onHit(this.character.damage());
 
         sceneEvents.on('enemy-killed', (xpAmount: number)=>{
-            this.lilith.setXp(xpAmount);
+            this.character.setXp(xpAmount);
+            fetch('127.0.0.1:3000/items')
+            .then(data => console.log(JSON.stringify(data.body)));
         }, this)
 
         knife.destroy();
     }
 
-    private onEnemyCollision(player:Phaser.GameObjects.GameObject, attacker:Phaser.GameObjects.GameObject){
+    private onEnemyHit(player:Phaser.GameObjects.GameObject, attacker:Phaser.GameObjects.GameObject){
         
         const enemy = attacker as Enemy;
  
-        const dx = this.lilith.x - enemy.x
-        const dy = this.lilith.y - enemy.y
+        const dx = this.character.x - enemy.x
+        const dy = this.character.y - enemy.y
 
         const dir = new Phaser.Math.Vector2(dx,dy).normalize().scale(200);
 
-        this.lilith.onHit(dir, enemy.damage());
         enemy.onPlayerCollision(dir);
-        sceneEvents.emit('player-took-damage', this.lilith.hp())
+        this.character.onHit(dir, enemy.damage());
+        sceneEvents.emit('player-took-damage', this.character.hp())
 
-        if(this.lilith.hp()<=0){
+        if(this.character.hp()<=0){
             sceneEvents.emit('player-died')
             this.thiefLiliColl?.destroy();
         }
@@ -134,13 +194,19 @@ export default class World01 extends Phaser.Scene
 
     update() {
 
-        if (this.lilith){
-            this.lilith.update(this.cursors);
+        if (this.character){
+            this.character.update(this.cursors);
         }
 
         if (this.thieves.children){
             this.thieves.getChildren().forEach((thief)=>{
                 thief.update();
+            })
+        }
+
+        if (this.skeletons.children){
+            this.skeletons.getChildren().forEach((skeleton)=>{
+                skeleton.update();
             })
         }
 

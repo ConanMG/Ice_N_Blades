@@ -5,7 +5,7 @@ import { Status } from "~/utils/Predet";
 
 export abstract class Character extends Phaser.Physics.Arcade.Sprite {
 
-    protected NEXT_LEVEL_XP = 1000
+    protected NEXT_LEVEL_XP = 20
     protected _MAX_HP!: number;
     protected _hp!: number;
     protected _speed: any;
@@ -18,7 +18,7 @@ export abstract class Character extends Phaser.Physics.Arcade.Sprite {
     protected _weapon!: Phaser.Physics.Arcade.Group
 
     protected _xp!: number;
-    protected _lvl!: number;
+    protected _lvl: number = 1;
     protected _skillPoints!: number;
 
     protected _damageTime: number = 0;
@@ -154,8 +154,9 @@ export abstract class Character extends Phaser.Physics.Arcade.Sprite {
         console.log("LEVEL UP!!!")
 
         sceneEvents.emit('player-leveled-up')
+        console.log(this._lvl)
 
-        this.NEXT_LEVEL_XP += 100 * this._lvl;
+        this.NEXT_LEVEL_XP += 10 * this._lvl;
         this._xp = 0;
         this._MAX_HP += 1 * this._skills['con'];
         this._hp = this._MAX_HP;
@@ -175,7 +176,7 @@ export abstract class Character extends Phaser.Physics.Arcade.Sprite {
         this.setTint(0xff0000);
         this._healthState = Status.DAMAGED;
         this._damageTime = 0;
-        this._hp = this._hp - (damage - (this._ac / 2));
+        this._hp = this._hp - damage / (this._ac / 2);
 
         this._healthBar.draw(this.x - 12.5, this.y - 15, this._hp)
 
