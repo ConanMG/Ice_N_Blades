@@ -67,12 +67,11 @@ export default class Skeleton extends Enemy {
 
         if (this._gameOver) {
             let probability = Math.random() * 100;
-            if (probability <= 100) {
+            if (probability >= 80) {
+                console.log('rises');
+                this._gameOver = false;
+                this._hp = this.FULL_HP;
                 this.anims.play('skeleton_rise')
-                this.on('animationcomplete', () => {
-                    this._gameOver = false;
-                    this._hp = this.FULL_HP;
-                })
             }
             else {
                 this.destroy();
