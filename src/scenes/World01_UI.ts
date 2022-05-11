@@ -26,7 +26,7 @@ export default class World01_UI extends Phaser.Scene {
         txtWave.setX(txtWave.x - (txtWave.width / 2))
         let deathScreen = this.add.text(screenCenterX, screenCenterY, "", { font: '7em Georgia', color: '#B20000' })
 
-        var nextWave = this.add.text(screenCenterX, screenCenterY, "Press '↵ Enter' to release the horde.", { font: '2em Georgia', color: '#FFFFFF' });
+        var nextWave = this.add.text(screenCenterX, (screenCenterY + screenCenterY) - 48, "Press '↵ Enter' to release the horde.", { font: '2em Georgia', color: '#FFFFFF' });
 
         this.waveBlink = this.time.addEvent({
             delay: 500,

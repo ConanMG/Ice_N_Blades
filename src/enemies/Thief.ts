@@ -105,7 +105,7 @@ export default class Thief extends Enemy {
             return; 
         }
     
-        if(!this._aggro ) {
+        if(!this._aggro && this._healthState == Status.HEALTHY) {
             switch(this._direction){
                 case Direction.UP:
                     this.anims.play('thief_run', true)
