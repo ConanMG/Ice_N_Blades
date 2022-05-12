@@ -102,6 +102,7 @@ export default class World01 extends Phaser.Scene {
                                     "Thief"
                                 )
                                 .setTarget(this.character);
+                                console.log('spawned Thief');
                             break;
                         case 2:
                             this.skeletons
@@ -111,6 +112,7 @@ export default class World01 extends Phaser.Scene {
                                     "Skeleton"
                                 )
                                 .setTarget(this.character);
+                                console.log('spawned Skeleton');
                             break;
                         case 3:
                             break;
@@ -136,6 +138,11 @@ export default class World01 extends Phaser.Scene {
         });
 
         sceneEvents.emit('wave-ended')
+
+        sceneEvents.on('player-died', () => {
+            
+            this.thiefLiliColl.destroy()
+        })
 
         // Adición de físicas y colisiones
 

@@ -118,7 +118,7 @@ export default class Lilith extends Character implements ICaster {
                 }
             break;
             case Status.DEAD:
-                this.setTint(0xffffff);
+                this.clearTint();
             break;
         }
     }

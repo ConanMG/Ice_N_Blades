@@ -167,8 +167,7 @@ export abstract class Character extends Phaser.Physics.Arcade.Sprite {
     }
 
     onHit(dir: Phaser.Math.Vector2, damage: number) {
-
-        if (this._healthState === Status.DAMAGED) {
+        if (this._healthState != Status.HEALTHY) {
             return;
         }
 
@@ -176,7 +175,7 @@ export abstract class Character extends Phaser.Physics.Arcade.Sprite {
         this.setTint(0xff0000);
         this._healthState = Status.DAMAGED;
         this._damageTime = 0;
-        this._hp = this._hp - damage / (this._ac / 2);
+        this._hp = this._hp - damage / (this._ac / 4);
 
         this._healthBar.draw(this.x - 12.5, this.y - 15, this._hp)
 
@@ -203,20 +202,20 @@ export abstract class Character extends Phaser.Physics.Arcade.Sprite {
         this._skills['cha'] = cha;
 
         this.calculateDamageSpeed()
-        
+
         this._MAX_HP = this._skills['con'] * 10;
 
         this._healthBar = new HealthBar(this.scene, this.x - 10, (this.y - this.height - 2), this._MAX_HP, this.width);
 
     }
 
-    calculateDamageSpeed(){
+    calculateDamageSpeed() {
 
         if (this._skills['str'] > this._skills['dex'])
             this._damage = this._skills['str'];
         else
             this._damage = this._skills['dex'];
-            
+
         this._speed = this._skills['dex'] + 100;
 
     }
@@ -234,8 +233,10 @@ export abstract class Character extends Phaser.Physics.Arcade.Sprite {
             return;
         }
 
+
         if (this._healthState === Status.DEAD) {
             this.setVelocity(0, 0);
+            sceneEvents.emit('player-died')
             this.anims.play('death', true);
             this.on("animationcomplete", () => {
                 this._gameOver = true;

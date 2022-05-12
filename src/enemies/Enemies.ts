@@ -80,7 +80,7 @@ export abstract class Enemy extends Phaser.Physics.Arcade.Sprite {
 
         this.FULL_HP = 10 * this._stats.get('con')!;
         this._hp = this.FULL_HP;
-        this._detectionRange = 15 + (this._stats.get('wis')! / 2);
+        this._detectionRange = 100 + (this._stats.get('wis')! / 2);
         this._speed = 100 + (this._stats.get('dex')! * 2);
     }
 
