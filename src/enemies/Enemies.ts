@@ -1,4 +1,5 @@
 import Phaser from "phaser";
+import { Character } from "~/characters/Character";
 import { sceneEvents } from "~/events/EventManager";
 import { Direction, Status } from "~/utils/Predet";
 
@@ -9,9 +10,7 @@ export abstract class Enemy extends Phaser.Physics.Arcade.Sprite {
     protected _healthState!: Status;
     protected _speed!: number;
     protected _damage!: number;
-    protected _detectionRange!: number;
     protected _ac!: number;
-    protected _direction!: Direction;
     protected _stats!: Map<string, number>;
 
     protected _xpDrop: number = 0;
@@ -38,14 +37,11 @@ export abstract class Enemy extends Phaser.Physics.Arcade.Sprite {
     }
 
     setAggro() {
-        var xDistance = this.x - this._target!.x
-        var yDistance = this.y - this._target!.y
-        if (Math.abs(xDistance) < this._detectionRange || Math.abs(yDistance) < this._detectionRange) {
-            this._aggro = true;
-        }
-        else {
-            this._aggro = false;
-        }
+        var character: Character = this._target as Character
+            if(character.healthState() != Status.DEAD)
+                this._aggro = true
+            else
+                this._aggro = false;
     }
 
     continueChase() {
@@ -78,9 +74,8 @@ export abstract class Enemy extends Phaser.Physics.Arcade.Sprite {
         else
             this._damage = this._stats.get('dex')!;
 
-        this.FULL_HP = 10 * this._stats.get('con')!;
+        this.FULL_HP = 1 * this._stats.get('con')!;
         this._hp = this.FULL_HP;
-        this._detectionRange = 100 + (this._stats.get('wis')! / 2);
         this._speed = 100 + (this._stats.get('dex')! * 2);
     }
 
@@ -91,7 +86,7 @@ export abstract class Enemy extends Phaser.Physics.Arcade.Sprite {
         }
 
         if (this._hp <= 0) {
-            if (this._healthState != Status.DEAD) {
+            if (this._healthState != Status.DEAD && !this._gameOver) {
                 sceneEvents.emit('enemy-killed', this._xpDrop);
                 this._healthState = Status.DEAD;
             }

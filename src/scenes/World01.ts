@@ -12,8 +12,10 @@ import { HealthBar } from "~/utils/Healthbar";
 import { Enemy } from "~/enemies/Enemies";
 import Skeleton from "~/enemies/Skeleton";
 import { createSkeletonAnims } from "~/anims/SkeletonAnims";
+import { Status } from "~/utils/Predet";
 
 export default class World01 extends Phaser.Scene {
+    private characterCollisions: Array<Phaser.Physics.Arcade.Collider> = new Array<Phaser.Physics.Arcade.Collider>()
     private thiefLiliColl!: Phaser.Physics.Arcade.Collider;
     private skeletonLiliColl!: Phaser.Physics.Arcade.Collider;
     private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
@@ -27,6 +29,7 @@ export default class World01 extends Phaser.Scene {
     private waveLength: number = 10;
     private enemiesLeft: number = 0;
     private nextWave: Boolean = true;
+    private waveOngoing: boolean = false;
 
     constructor() {
         super({ key: "World01" });
@@ -50,7 +53,7 @@ export default class World01 extends Phaser.Scene {
         //Mapa
 
         var map = this.make.tilemap({ key: "map" });
-        var tileset = map.addTilesetImage("Tiles", "tiles", 16, 16, 1, 2);
+        var tileset = map.addTilesetImage("stygia", "tiles", 16, 16, 0, 0);
 
         const ground = map.createLayer("Ground", tileset);
         const walls = map.createLayer("Walls", tileset);
@@ -63,8 +66,17 @@ export default class World01 extends Phaser.Scene {
             classType: Phaser.Physics.Arcade.Image,
         });
 
-        this.character = this.add.Lilith(48, 48, "Lilith");
+        this.character = this.add.Lilith(width/2, height/2, "Lilith");
         this.character.setWeapon(this.knives);
+
+        sceneEvents.on(
+            "enemy-killed",
+            (xpAmount: number) => {
+                console.log(xpAmount)
+                this.character.setXp(xpAmount);
+            },
+            this
+        );
 
         //Crear los grupos de enemigos
 
@@ -87,61 +99,72 @@ export default class World01 extends Phaser.Scene {
         // Programación de la generación de enemigos
 
         this.input.keyboard.on('keydown-' + 'ENTER', () => {
-            console.log("registered event")
-            sceneEvents.emit('wave-started', this.waveLength)
-            
-            this.enemySpawner = this.time.addEvent({
-                delay: 1000,
-                callback: () => {
-                    switch (Math.round(Math.random() * 2)) {
-                        case 1:
-                            this.thieves
-                                .get(
-                                    this.scale.width * Math.random(),
-                                    this.scale.height * Math.random(),
-                                    "Thief"
-                                )
-                                .setTarget(this.character);
-                                console.log('spawned Thief');
-                            break;
-                        case 2:
-                            this.skeletons
-                                .get(
-                                    this.scale.width * Math.random(),
-                                    this.scale.height * Math.random(),
-                                    "Skeleton"
-                                )
-                                .setTarget(this.character);
-                                console.log('spawned Skeleton');
-                            break;
-                        case 3:
-                            break;
-                        case 4:
-                            break;
-                        case 5:
-                            break;
-                        case 6:
-                            break;
-                        case 7:
-                            break;
-                        case 8:
-                            break;
-                        default:
-                            break;
-                    }
-                    this.enemiesLeft ++;
-                },
-                repeat: this.waveLength,
-            });
 
-            this.waveLength *= 2;
+            if (!this.waveOngoing) {
+                console.log("registered event")
+                sceneEvents.emit('wave-started', this.waveLength)
+                this.waveOngoing = true;
+
+                this.enemySpawner = this.time.addEvent({
+                    delay: 1000,
+                    callback: () => {
+                        var rand = Math.round(Math.random() * 1);
+                        console.log(rand);
+                        switch (rand) {
+                            case 1:
+                                this.thieves
+                                    .get(
+                                        900,
+                                        900,
+                                        "Thief"
+                                    )
+                                    .setTarget(this.character);
+                                console.log('spawned Thief');
+                                break;
+                            case 0:
+                                this.skeletons
+                                    .get(
+                                        900,
+                                        900,
+                                        "Skeleton"
+                                    )
+                                    .setTarget(this.character);
+                                console.log('spawned Skeleton');
+                                break;
+                            case 2:
+                                break;
+                            case 3:
+                                break;
+                            case 4:
+                                break;
+                            case 5:
+                                break;
+                            case 6:
+                                break;
+                            case 7:
+                                break;
+                            default:
+                                break;
+                        }
+                        this.enemiesLeft++;
+                    },
+                    repeat: this.waveLength - 1
+                });
+
+                this.waveLength *= 2;
+            }
         });
 
         sceneEvents.emit('wave-ended')
 
         sceneEvents.on('player-died', () => {
-            
+            if (this.character.healthState() === Status.DEAD)
+                return;
             this.thiefLiliColl.destroy()
+        })
+
+        sceneEvents.on('wave-ended', () => {
+            this.waveOngoing = false;
         })
 
         // Adición de físicas y colisiones
@@ -186,8 +209,11 @@ export default class World01 extends Phaser.Scene {
             this
         );
 
-        // Manejo de la cámara
+        this.characterCollisions.push(this.thiefLiliColl)
+        this.characterCollisions.push(this.skeletonLiliColl)
+        this.characterCollisions.push(this.thiefLiliColl)
 
+        // Manejo de la cámara
         this.cameras.main.startFollow(this.character, true, 1, 1);
         this.cameras.main.centerOn(this.character.x, this.character.y);
         this.cameras.main.zoom = 3;
@@ -211,17 +237,6 @@ export default class World01 extends Phaser.Scene {
 
         enemy.onHit(this.character.damage());
 
-        sceneEvents.on(
-            "enemy-killed",
-            (xpAmount: number) => {
-                this.character.setXp(xpAmount);
-                fetch("127.0.0.1:3000/items").then((data) =>
-                    console.log(JSON.stringify(data.body))
-                );
-            },
-            this
-        );
-
         knife.destroy();
     }
 
@@ -240,15 +255,14 @@ export default class World01 extends Phaser.Scene {
         this.character.onHit(dir, enemy.damage());
         sceneEvents.emit("player-took-damage", this.character.hp());
 
-        if (this.character.hp() <= 0) {
+        if (this.character.hp() <= 0 && this.character.healthState() != Status.DEAD) {
             sceneEvents.emit("player-died");
-            this.thiefLiliColl?.destroy();
         }
     }
 
     update() {
 
-        if(this.enemiesLeft === 0) {
+        if (this.enemiesLeft === 0) {
             sceneEvents.emit('wave_ended')
         }
 

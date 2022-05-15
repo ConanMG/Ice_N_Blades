@@ -27,6 +27,10 @@ export class HealthBar {
         scene.add.existing(this._bar);
     }
 
+    destroy() {
+        this._bar.destroy();
+    }
+
     expandHealth(newHp: number){
         this.fullHealth = newHp;
     }

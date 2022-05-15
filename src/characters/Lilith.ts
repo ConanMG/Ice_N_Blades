@@ -1,4 +1,5 @@
 import Phaser from "phaser";
+import { sceneEvents } from "~/events/EventManager";
 import ICaster from "~/interfaces/ICaster";
 import { Status } from "~/utils/Predet"
 import { Character } from "./Character";
@@ -106,12 +107,17 @@ export default class Lilith extends Character implements ICaster {
 
         super.preUpdate(time, delta);
 
+        sceneEvents.on('player-died', () => {
+            this._healthState = Status.DEAD;
+        })
+
         switch(this._healthState){
             case Status.HEALTHY:
             break;
             case Status.DAMAGED:
                 this._damageTime += delta;
                 if(this._damageTime >= 150){
+                    this.body.onCollide = true;
                     this._healthState = Status.HEALTHY;
                     this.setTint(0xffffff);
                     this._damageTime = 0;
@@ -119,6 +125,7 @@ export default class Lilith extends Character implements ICaster {
             break;
             case Status.DEAD:
                 this.clearTint();
+                this._healthBar.destroy();
             break;
         }
     }
@@ -126,7 +133,7 @@ export default class Lilith extends Character implements ICaster {
     update(cursors: Phaser.Types.Input.Keyboard.CursorKeys) {
         super.update(cursors);
 
-        if(Phaser.Input.Keyboard.JustDown(cursors.space)){
+        if(Phaser.Input.Keyboard.JustDown(cursors.space) && this._healthState === Status.HEALTHY){
             this.attack();
             return
         }

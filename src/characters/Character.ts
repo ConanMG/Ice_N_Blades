@@ -5,7 +5,7 @@ import { Status } from "~/utils/Predet";
 
 export abstract class Character extends Phaser.Physics.Arcade.Sprite {
 
-    protected NEXT_LEVEL_XP = 20
+    protected NEXT_LEVEL_XP = 1000
     protected _MAX_HP!: number;
     protected _hp!: number;
     protected _speed: any;
@@ -17,7 +17,7 @@ export abstract class Character extends Phaser.Physics.Arcade.Sprite {
 
     protected _weapon!: Phaser.Physics.Arcade.Group
 
-    protected _xp!: number;
+    protected _xp: number = 0;
     protected _lvl: number = 1;
     protected _skillPoints!: number;
 
@@ -68,7 +68,7 @@ export abstract class Character extends Phaser.Physics.Arcade.Sprite {
         return this._xp;
     }
     public setXp(xp: number) {
-        this._xp = xp;
+        this._xp = this._xp + xp;
     }
     public skillPoints() {
         return this._skillPoints;
@@ -78,6 +78,7 @@ export abstract class Character extends Phaser.Physics.Arcade.Sprite {
     }
 
     checkXp() {
+        console.log(this._xp)
         if (this._xp >= this.NEXT_LEVEL_XP)
             this.levelUp()
     }
@@ -176,12 +177,9 @@ export abstract class Character extends Phaser.Physics.Arcade.Sprite {
         this._healthState = Status.DAMAGED;
         this._damageTime = 0;
         this._hp = this._hp - damage / (this._ac / 4);
+        this.body.onCollide = false
 
         this._healthBar.draw(this.x - 12.5, this.y - 15, this._hp)
-
-        if (this._hp <= 0) {
-            this._healthState = Status.DEAD
-        }
     }
 
     setupSkills(str: number, dex: number, con: number, int: number, wis: number, cha: number) {
@@ -203,7 +201,7 @@ export abstract class Character extends Phaser.Physics.Arcade.Sprite {
 
         this.calculateDamageSpeed()
 
-        this._MAX_HP = this._skills['con'] * 10;
+        this._MAX_HP = this._skills['con'] * 5;
 
         this._healthBar = new HealthBar(this.scene, this.x - 10, (this.y - this.height - 2), this._MAX_HP, this.width);
 
@@ -236,7 +234,6 @@ export abstract class Character extends Phaser.Physics.Arcade.Sprite {
 
         if (this._healthState === Status.DEAD) {
             this.setVelocity(0, 0);
-            sceneEvents.emit('player-died')
             this.anims.play('death', true);
             this.on("animationcomplete", () => {
                 this._gameOver = true;
