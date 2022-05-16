@@ -78,7 +78,6 @@ export abstract class Character extends Phaser.Physics.Arcade.Sprite {
     }
 
     checkXp() {
-        console.log(this._xp)
         if (this._xp >= this.NEXT_LEVEL_XP)
             this.levelUp()
     }

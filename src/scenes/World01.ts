@@ -114,8 +114,8 @@ export default class World01 extends Phaser.Scene {
                             case 1:
                                 this.thieves
                                     .get(
-                                        900,
-                                        900,
+                                        (105 + 1154) * Math.random(),
+                                        (115 + 1140) * Math.random(),
                                         "Thief"
                                     )
                                     .setTarget(this.character);
@@ -124,8 +124,8 @@ export default class World01 extends Phaser.Scene {
                             case 0:
                                 this.skeletons
                                     .get(
-                                        900,
-                                        900,
+                                        (1154 * Math.random()) + 105,
+                                        (1140 * Math.random()) + 115,
                                         "Skeleton"
                                     )
                                     .setTarget(this.character);
@@ -261,6 +261,9 @@ export default class World01 extends Phaser.Scene {
     }
 
     update() {
+
+        console.log("x:" + this.character.x)
+        console.log("y:" + this.character.y)
 
         if (this.enemiesLeft === 0) {
             sceneEvents.emit('wave_ended')
