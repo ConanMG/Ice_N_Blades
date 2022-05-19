@@ -27,13 +27,15 @@ export default class World01_UI extends Phaser.Scene {
         const screenCenterX = this.cameras.main.worldView.x + this.cameras.main.width / 2;
         const screenCenterY = this.cameras.main.worldView.y + this.cameras.main.height / 2;
 
-        let txtEnemiesLeft = this.add.text(10, 10, `Enemies Left: ${this.enemiesLeft}`, { font: '4em Georgia', color: '#000000' });
-        let txtLevel = this.add.text(10, 48, `Level: ${this.level}`, { font: '2em Georgia', color: '#000000' });
-        let txtWave = this.add.text(screenCenterX + screenCenterX, 10, `Wave ${this.wave}`, { font: '4em Georgia', color: '#000000' });
+        let txtEnemiesLeft = this.add.text(10, 10, `Enemies Left: ${this.enemiesLeft}`, { font: '4em CustomFont', color: '#000000' });
+        let txtLevel = this.add.text(10, 48, `Level: ${this.level}`, { font: '2em CustomFont', color: '#000000' });
+        let txtWave = this.add.text(screenCenterX + screenCenterX, 10, `Wave ${this.wave}`, { font: '4em CustomFont', color: '#000000' });
         txtWave.setX(txtWave.x - (txtWave.width + 5))
         let deathScreen = this.add.text(screenCenterX, screenCenterY, "", { font: '7em Georgia', color: '#B20000' })
+        let leaderboard = this.add.text(screenCenterX, screenCenterY, "", { font: '5em CustomFont', color: '#FFFFFF' })
+        let board = this.add.graphics()
 
-        var nextWave = this.add.text(screenCenterX, (screenCenterY + screenCenterY) - 48, "Press '↵ Enter' to release the horde.", { font: '2em Georgia', color: '#000000' });
+        var nextWave = this.add.text(screenCenterX, (screenCenterY + screenCenterY) - 48, "Press '↵ Enter' to release the horde.", {font: '2em CustomFont', color: '#000000' });
         nextWave.setX(nextWave.x - nextWave.width/2)
 
         this.waveBlink = this.time.addEvent({
@@ -47,7 +49,7 @@ export default class World01_UI extends Phaser.Scene {
             loop: true
         })
 
-        var menuKey = this.input.keyboard.addKey('ESC');
+       var menuKey = this.input.keyboard.addKey('ESC');
         menuKey.on('keyup', (eventArgs) => {
 
         })
@@ -74,11 +76,7 @@ export default class World01_UI extends Phaser.Scene {
             this.waveBlink.paused = false;
         })
 
-        sceneEvents.on('player-died', () => {
-
-            var data = { "_kills": this.killCount.valueOf(), "_wave": this.wave.valueOf()}
-            this.makeRequest("POST", 'https://videogame-api-conanmg.herokuapp.com/score', data)
-            this.makeRequest("GET", 'https://videogame-api-conanmg.herokuapp.com/scores')
+        sceneEvents.on('player-died', async () => {
             deathScreen.alpha = 0;
             this.tweens.add({
                 targets: deathScreen,
@@ -87,6 +85,61 @@ export default class World01_UI extends Phaser.Scene {
             }); 
             deathScreen.setText("YOU DIED");
             deathScreen.setX(deathScreen.x - (deathScreen.width / 2))
+            deathScreen.setX(deathScreen.y - (deathScreen.height / 2))
+
+            var data = { "_kills": this.killCount.valueOf(), "_wave": this.wave.valueOf()}
+            /*var config = {
+                method: 'POST',
+                url: 'https://videogame-api-conanmg.herokuapp.com/score',
+                headers: { 
+                  'Content-Type': 'application/json'
+                },
+                data : data
+              };
+              
+              axios(config)
+              .then(function (response) {
+                    Object.entries(response.data).forEach(score => {
+                        const [key, value] = score;
+                        console.log(`${key}: ${value}`)
+                    });
+              })
+              .catch(function (error) {
+                console.log(error);
+              });
+            */
+              var config = {
+                method: 'GET',
+                url: 'https://videogame-api-conanmg.herokuapp.com/scores',
+                headers: { 
+                  'Content-Type': 'application/json'
+                },
+                data : data
+              };
+              
+              await setTimeout(() => {
+              axios(config)
+              .then(function (response) {
+                    var max = 0
+                    var leaderboardString = 'LEADERBOARD\n'
+                    response.data.forEach((score) => {
+                        deathScreen.destroy();
+                        if(max < 5){
+                            leaderboardString += '\n' + 'kills: ' + score._kills + 'wave: ' +  score._wave
+                        }
+                        leaderboard.text = leaderboardString
+                        leaderboard.setX(screenCenterX - leaderboard.width/2)
+                        leaderboard.setY(screenCenterY - leaderboard.height/2)
+                        board.fillRect(leaderboard.x - 20, leaderboard.y - 20, leaderboard.width + 40, leaderboard.height + 40)
+                        board.setDepth(-1)
+                        board.fillStyle(0, 1)
+                        max++   
+                    })
+              })
+              .catch(function (error) {
+                console.log(error);
+              });
+            }, 3000)
         })
 
         sceneEvents.on('player-leveled-up', () => {
@@ -99,25 +152,6 @@ export default class World01_UI extends Phaser.Scene {
             this.enemiesLeft++;
             txtEnemiesLeft.setText(`Enemies Left: ${this.enemiesLeft}`);
         }, this)
-    }
-
-    async makeRequest(method: string ,myUrl: string, data?: Object) {
-          var config = {
-            method: method,
-            url: myUrl,
-            headers: { 
-              'Content-Type': 'application/json'
-            },
-            data : data
-          };
-          
-          axios(config)
-          .then(function (response) {
-            console.log(JSON.stringify(response.data));
-          })
-          .catch(function (error) {
-            console.log(error);
-          });
     }
 
 }
