@@ -27,15 +27,15 @@ export default class World01_UI extends Phaser.Scene {
         const screenCenterX = this.cameras.main.worldView.x + this.cameras.main.width / 2;
         const screenCenterY = this.cameras.main.worldView.y + this.cameras.main.height / 2;
 
-        let txtEnemiesLeft = this.add.text(10, 10, `Enemies Left: ${this.enemiesLeft}`, { font: '4em CustomFont', color: '#000000' });
-        let txtLevel = this.add.text(10, 48, `Level: ${this.level}`, { font: '2em CustomFont', color: '#000000' });
-        let txtWave = this.add.text(screenCenterX + screenCenterX, 10, `Wave ${this.wave}`, { font: '4em CustomFont', color: '#000000' });
+        let txtEnemiesLeft = this.add.text(10, 10, `Enemies Left: ${this.enemiesLeft}`, { font: '4em Georgia', color: '#000000' }).setDepth(-2);
+        let txtLevel = this.add.text(10, 48, `Level: ${this.level}`, { font: '2em Georgia', color: '#000000' }).setDepth(-2);
+        let txtWave = this.add.text(screenCenterX + screenCenterX, 10, `Wave ${this.wave}`, { font: '4em Georgia', color: '#000000' }).setDepth(-2);
         txtWave.setX(txtWave.x - (txtWave.width + 5))
         let deathScreen = this.add.text(screenCenterX, screenCenterY, "", { font: '7em Georgia', color: '#B20000' })
-        let leaderboard = this.add.text(screenCenterX, screenCenterY, "", { font: '5em CustomFont', color: '#FFFFFF' })
-        let board = this.add.graphics()
+        let leaderboard = this.add.text(screenCenterX, screenCenterY, "", { font: '5em Georgia', color: '#FFFFFF' })
+        let board = this.add.image(0,0,'Scroll').setVisible(false);
 
-        var nextWave = this.add.text(screenCenterX, (screenCenterY + screenCenterY) - 48, "Press '↵ Enter' to release the horde.", {font: '2em CustomFont', color: '#000000' });
+        var nextWave = this.add.text(screenCenterX, (screenCenterY + screenCenterY) - 48, "Press '↵ Enter' to release the horde.", {font: '2em Georgia', color: '#000000' });
         nextWave.setX(nextWave.x - nextWave.width/2)
 
         this.waveBlink = this.time.addEvent({
@@ -130,9 +130,14 @@ export default class World01_UI extends Phaser.Scene {
                         leaderboard.text = leaderboardString
                         leaderboard.setX(screenCenterX - leaderboard.width/2)
                         leaderboard.setY(screenCenterY - leaderboard.height/2)
-                        board.fillRect(leaderboard.x - 20, leaderboard.y - 20, leaderboard.width + 40, leaderboard.height + 40)
+                        
+                        /* board.fillRect(leaderboard.x - 20, leaderboard.y - 20, leaderboard.width + 40, leaderboard.height + 40)
                         board.setDepth(-1)
-                        board.fillStyle(0, 1)
+                        board.fillStyle(0, 1) */
+                        board.setX(screenCenterX)
+                        board.setY(screenCenterY)
+                        board.setDepth(-1);
+                        board.setVisible(true);
                         max++   
                     })
               })

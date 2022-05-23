@@ -1,7 +1,7 @@
 import Phaser from "phaser";
 import { sceneEvents } from "~/events/EventManager";
 import { HealthBar } from "~/utils/Healthbar";
-import { Status } from "~/utils/Predet";
+import { Direction, Status } from "~/utils/Predet";
 
 export abstract class Character extends Phaser.Physics.Arcade.Sprite {
 
@@ -11,6 +11,7 @@ export abstract class Character extends Phaser.Physics.Arcade.Sprite {
     protected _speed: any;
     protected _healthState!: Status;
     protected _skills!: Map<string, number>
+    protected _cooldowns!: Map<string, number>
     protected _ac!: number;
     protected _gameOver!: boolean;
     protected _damage!: number;
@@ -75,6 +76,9 @@ export abstract class Character extends Phaser.Physics.Arcade.Sprite {
     }
     public setSkillPoints(skillPoints: number) {
         this._skillPoints = skillPoints;
+    }
+    public lastDirection(){
+        return this._lastDirection;
     }
 
     checkXp() {
@@ -198,6 +202,10 @@ export abstract class Character extends Phaser.Physics.Arcade.Sprite {
         this._skills['wis'] = wis;
         this._skills['cha'] = cha;
 
+        this._cooldowns = new Map<string, number>([
+            ['mistyStep', 6]
+        ])
+
         this.calculateDamageSpeed()
 
         this._MAX_HP = this._skills['con'] * 5;
@@ -219,6 +227,8 @@ export abstract class Character extends Phaser.Physics.Arcade.Sprite {
 
     update(cursors: Phaser.Types.Input.Keyboard.CursorKeys) {
 
+        super.update()
+
         if (this._gameOver) {
             return;
         }
@@ -230,58 +240,58 @@ export abstract class Character extends Phaser.Physics.Arcade.Sprite {
             return;
         }
 
-
         if (this._healthState === Status.DEAD) {
             this.setVelocity(0, 0);
             this.anims.play('death', true);
-            this.on("animationcomplete", () => {
+            this.once("animationcomplete", () => {
                 this._gameOver = true;
                 this.destroy();
             })
             return
         }
+        else{
+            if (cursors.left.isDown) {
+                    this.setFlipX(false);
+                    this.setVelocityX(-this._speed);
+                    this.setVelocityY(0);
+                    this.anims.play('left', true);
+                    this._lastDirection = this.anims.currentAnim.key;
+            } else if (cursors.right.isDown) {
+                    this.setFlipX(false);
+                    this.setVelocityX(this._speed);
+                    this.setVelocityY(0);
+                    this.anims.play('right', true);
+                    this._lastDirection = this.anims.currentAnim.key;
+            } else if (cursors.down.isDown) {
+                    this.setFlipX(false);
+                    this.setVelocityY(this._speed);
+                    this.setVelocityX(0);
+                    this.anims.play('down', true);
+                    this._lastDirection = this.anims.currentAnim.key;
+            } else if (cursors.up.isDown) {
+                    this.setFlipX(false);
+                    this.setVelocityY(-this._speed);
+                    this.setVelocityX(0);
+                    this.anims.play('up', true);
+                    this._lastDirection = this.anims.currentAnim.key;
+            } else {
+                this.setVelocityX(0);
+                this.setVelocityY(0);
 
-        if (cursors.left.isDown) {
-            this.setFlipX(false)
-            this.setVelocityX(-this._speed);
-            this.setVelocityY(0);
-            this.anims.play('left', true);
-            this._lastDirection = this.anims.currentAnim.key;
-        } else if (cursors.right.isDown) {
-            this.setFlipX(false)
-            this.setVelocityX(this._speed);
-            this.setVelocityY(0);
-            this.anims.play('right', true);
-            this._lastDirection = this.anims.currentAnim.key;
-        } else if (cursors.down.isDown) {
-            this.setFlipX(false)
-            this.setVelocityY(this._speed);
-            this.setVelocityX(0);
-            this.anims.play('down', true);
-            this._lastDirection = this.anims.currentAnim.key;
-        } else if (cursors.up.isDown) {
-            this.setFlipX(false)
-            this.setVelocityY(-this._speed);
-            this.setVelocityX(0);
-            this.anims.play('up', true);
-            this._lastDirection = this.anims.currentAnim.key;
-        } else {
-            this.setVelocityX(0);
-            this.setVelocityY(0);
+                switch (this._lastDirection) {
+                    case 'right' || 'up':
+                        this.setFlipX(false)
+                        break;
+                    case 'left' || 'down':
+                        this.setFlipX(true)
+                        break;
+                    default:
+                        this.setFlipX(false)
+                        break;
+                }
 
-            switch (this._lastDirection) {
-                case 'right' || 'up':
-                    this.setFlipX(false)
-                    break;
-                case 'left' || 'down':
-                    this.setFlipX(true)
-                    break;
-                default:
-                    this.setFlipX(false)
-                    break;
+                this.play('idle', true)
             }
-
-            this.play('idle', true)
         }
         this._healthBar.draw(this.x - 9, this.y - 18, this._hp)
 

@@ -31,6 +31,14 @@ export class HealthBar {
         this._bar.destroy();
     }
 
+    hide() {
+        this._bar.setVisible(false);
+    }
+
+    show() {
+        this._bar.setVisible(true);
+    }
+
     expandHealth(newHp: number){
         this.fullHealth = newHp;
     }

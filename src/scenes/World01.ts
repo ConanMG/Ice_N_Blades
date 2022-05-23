@@ -30,6 +30,7 @@ export default class World01 extends Phaser.Scene {
     private enemiesLeft: number = 0;
     private nextWave: Boolean = true;
     private waveOngoing: boolean = false;
+    private _dodgeActive: boolean = false;
 
     constructor() {
         super({ key: "World01" });
@@ -209,9 +210,14 @@ export default class World01 extends Phaser.Scene {
             this
         );
 
-        this.characterCollisions.push(this.thiefLiliColl)
-        this.characterCollisions.push(this.skeletonLiliColl)
-        this.characterCollisions.push(this.thiefLiliColl)
+        this.characterCollisions.push(this.thiefLiliColl);
+        this.characterCollisions.push(this.skeletonLiliColl);
+        this.characterCollisions.push(this.thiefLiliColl);
+
+        var mistyStep = this.input.keyboard.on('keydown-SHIFT', ()=>{
+            var lilith = this.character as Lilith
+            lilith.mistyStep(lilith.lastDirection());
+        });
 
         // Manejo de la cámara
         this.cameras.main.startFollow(this.character, true, 1, 1);
@@ -244,6 +250,9 @@ export default class World01 extends Phaser.Scene {
         player: Phaser.GameObjects.GameObject,
         attacker: Phaser.GameObjects.GameObject
     ) {
+        if(this._dodgeActive)
+            return
+        
         const enemy = attacker as Enemy;
 
         const dx = this.character.x - enemy.x;
@@ -261,6 +270,17 @@ export default class World01 extends Phaser.Scene {
     }
 
     update() {
+
+        this._dodgeActive = (this.character as Lilith).mistyStepPlaying;
+
+        if(this.character.healthState() != Status.DEAD){
+            if(this._dodgeActive){
+                this.character.body.enable = false
+            }
+            else{
+                this.character.body.enable = true
+            }
+        }
 
         if (this.enemiesLeft === 0) {
             sceneEvents.emit('wave_ended')

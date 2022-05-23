@@ -1,4 +1,4 @@
-import Phaser from "phaser";
+import Phaser, { Tilemaps } from "phaser";
 import { sceneEvents } from "~/events/EventManager";
 import ICaster from "~/interfaces/ICaster";
 import { Status } from "~/utils/Predet"
@@ -17,6 +17,7 @@ export default class Lilith extends Character implements ICaster {
     cooldown!: number;
     spells!: String[];
     cooldownTimer!: Phaser.Time.TimerEvent;
+    mistyStepPlaying: boolean = false;
 
     constructor(scene:Phaser.Scene, x:number, y:number, texture: string, frame?:string|number){
         super(scene,x,y,texture,frame);
@@ -106,6 +107,9 @@ export default class Lilith extends Character implements ICaster {
     preUpdate(time: number, delta: number) {
 
         super.preUpdate(time, delta);
+        if(this.mistyStepPlaying)
+            return
+            
 
         sceneEvents.on('player-died', () => {
             this._healthState = Status.DEAD;
@@ -131,12 +135,48 @@ export default class Lilith extends Character implements ICaster {
     }
 
     update(cursors: Phaser.Types.Input.Keyboard.CursorKeys) {
+        if(this.mistyStepPlaying)
+            return
+            
         super.update(cursors);
 
         if(Phaser.Input.Keyboard.JustDown(cursors.space) && this._healthState === Status.HEALTHY){
             this.attack();
             return
         }
+    }
+
+    mistyStep(dir: string) {
+        this.mistyStepPlaying = true;
+        if(dir === 'left'){
+            this.setFlipX(true)
+        }
+
+        this.anims.play('disappear', true);
+        this._healthBar.hide()
+        this.once('animationcomplete', () => {
+            console.log(dir)
+            this.anims.play('appear', true)
+            switch(dir) {
+                case 'right':
+                    this.setPosition(this.x + 100, this.y);
+                    break;
+                case 'left':
+                    this.setPosition(this.x - 100, this.y);
+                    break;
+                case 'up':
+                    this.setPosition(this.x, this.y - 100);
+                    break;
+                case 'down':
+                    this.setPosition(this.x, this.y + 100);
+                    break;
+            }
+            this.once('animationcomplete', () => {
+                this._healthBar.show()
+                this.setFlipX(false)
+                this.mistyStepPlaying = false;
+            })
+        })
     }
 
 

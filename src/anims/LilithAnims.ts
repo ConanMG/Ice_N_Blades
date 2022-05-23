@@ -47,7 +47,7 @@ const createMainCharAnims = (anims: Phaser.Animations.AnimationManager)=>{
         {
             key: 'hurt',
             frames: anims.generateFrameNames('Lilith', { prefix: 'Hurt', end: 3, zeroPad: 4 }),
-            frameRate: 6,
+            frameRate: 12,
             repeat: 0
         }
     );
@@ -55,6 +55,22 @@ const createMainCharAnims = (anims: Phaser.Animations.AnimationManager)=>{
         {
             key: 'death',
             frames: anims.generateFrameNames('Lilith', { prefix: 'Death', end: 6, zeroPad: 4 }),
+            frameRate: 12,
+            repeat: 0
+        }
+    );
+    anims.create(
+        {
+            key: 'disappear',
+            frames: anims.generateFrameNames('Lilith', { prefix: 'Disappear', end: 4, zeroPad: 4 }),
+            frameRate: 16,
+            repeat: 0
+        }
+    );
+    anims.create(
+        {
+            key: 'appear',
+            frames: anims.generateFrameNames('Lilith', { prefix: 'Appear', end: 3, zeroPad: 4 }),
             frameRate: 12,
             repeat: 0
         }
