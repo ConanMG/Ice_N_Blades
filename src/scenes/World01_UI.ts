@@ -125,7 +125,7 @@ export default class World01_UI extends Phaser.Scene {
                     response.data.forEach((score) => {
                         deathScreen.destroy();
                         if(max < 5){
-                            leaderboardString += '\n' + 'kills: ' + score._kills + 'wave: ' +  score._wave
+                            leaderboardString += '\n' + 'kills: ' + score._kills + ' wave: ' +  score._wave
                         }
                         leaderboard.text = leaderboardString
                         leaderboard.setX(screenCenterX - leaderboard.width/2)

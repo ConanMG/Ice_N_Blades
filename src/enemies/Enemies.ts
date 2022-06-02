@@ -22,6 +22,10 @@ export abstract class Enemy extends Phaser.Physics.Arcade.Sprite {
     protected _damageTime!: number;
     protected _gameOver: boolean = false;
 
+    healthState() {
+        return this._healthState;
+    }
+
     constructor(scene: Phaser.Scene, x: number, y: number, texture: string, frame?: string | number) {
         super(scene, x, y, texture, frame);
 

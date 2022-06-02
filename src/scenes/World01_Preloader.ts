@@ -31,6 +31,8 @@ export default class World01_Preloader extends Phaser.Scene {
         this.load.atlas('Lilith', 'character/Main_Spritesheet.png', 'character/Main_Spritesheet.json');
         this.load.atlas('Thief', 'enemies/Thief_Spritesheet.png', 'enemies/Thief_Spritesheet.json');
         this.load.atlas('Skeleton', 'enemies/Skeleton_Spritesheet.png', 'enemies/Skeleton_Spritesheet.json');
+        this.load.atlas('Slime', 'enemies/Slime_Spritesheet.png', 'enemies/Slime_Spritesheet.json');
+        this.load.atlas('Lamia', 'enemies/Lamia_Spritesheet.png', 'enemies/Lamia_Spritesheet.json');
         this.load.image('tiles', 'tiles/stygia.png');
         this.load.image('Scroll', 'ui/Scroll.png');
         this.load.tilemapTiledJSON('map', 'dungeons/Mapa.json');

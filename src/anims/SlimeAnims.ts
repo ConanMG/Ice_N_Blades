@@ -12,8 +12,8 @@ const createSlimeAnims = (anims: Phaser.Animations.AnimationManager)=>{
     );
     anims.create(
         {
-            key: 'slime_run',
-            frames: anims.generateFrameNames('Slime', { prefix: 'Run', end: 7, zeroPad: 4 }),
+            key: 'slime_move',
+            frames: anims.generateFrameNames('Slime', { prefix: 'Move', end: 10, zeroPad: 4 }),
             frameRate: 12,
             repeat: -1
         }
@@ -21,7 +21,7 @@ const createSlimeAnims = (anims: Phaser.Animations.AnimationManager)=>{
     anims.create(
         {
             key: 'slime_attack',
-            frames: anims.generateFrameNames('Slime', { prefix: 'Attack', end: 2, zeroPad: 4 }),
+            frames: anims.generateFrameNames('Slime', { prefix: 'Attack', end: 3, zeroPad: 4 }),
             frameRate: 12,
             repeat: 0
         }
@@ -29,7 +29,7 @@ const createSlimeAnims = (anims: Phaser.Animations.AnimationManager)=>{
     anims.create(
         {
             key: 'slime_hurt',
-            frames: anims.generateFrameNames('Slime', { prefix: 'Hurt', end: 2, zeroPad: 4 }),
+            frames: anims.generateFrameNames('Slime', { prefix: 'Hurt', end: 5, zeroPad: 4 }),
             frameRate: 12,
             repeat: 0
         }
@@ -37,7 +37,7 @@ const createSlimeAnims = (anims: Phaser.Animations.AnimationManager)=>{
     anims.create(
         {
             key: 'slime_death',
-            frames: anims.generateFrameNames('Slime', { prefix: 'Death', end: 4, zeroPad: 4 }),
+            frames: anims.generateFrameNames('Slime', { prefix: 'Death', end: 6, zeroPad: 4 }),
             frameRate: 12,
             repeat: 0
         }

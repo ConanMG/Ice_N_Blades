@@ -13,17 +13,25 @@ import { Enemy } from "~/enemies/Enemies";
 import Skeleton from "~/enemies/Skeleton";
 import { createSkeletonAnims } from "~/anims/SkeletonAnims";
 import { Status } from "~/utils/Predet";
+import Slime from "~/enemies/Slime";
+import { createSlimeAnims } from "~/anims/SlimeAnims";
+import { createLamiaAnims } from "~/anims/LamiaAnims";
+import Lamia from "~/enemies/Lamia";
 
 export default class World01 extends Phaser.Scene {
     private characterCollisions: Array<Phaser.Physics.Arcade.Collider> = new Array<Phaser.Physics.Arcade.Collider>()
     private thiefLiliColl!: Phaser.Physics.Arcade.Collider;
     private skeletonLiliColl!: Phaser.Physics.Arcade.Collider;
+    private slimeLiliColl!: Phaser.Physics.Arcade.Collider;
+    private lamiaLiliColl!: Phaser.Physics.Arcade.Collider;
     private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
 
     private character!: Lilith;
     private knives!: Phaser.Physics.Arcade.Group;
     private thieves!: Phaser.Physics.Arcade.Group;
     private skeletons!: Phaser.Physics.Arcade.Group;
+    private slimes!: Phaser.Physics.Arcade.Group;
+    private lamias!: Phaser.Physics.Arcade.Group;
 
     private enemySpawner!: Phaser.Time.TimerEvent;
     private waveLength: number = 10;
@@ -50,6 +58,8 @@ export default class World01 extends Phaser.Scene {
         createMainCharAnims(this.anims);
         createThiefAnims(this.anims);
         createSkeletonAnims(this.anims);
+        createSlimeAnims(this.anims);
+        createLamiaAnims(this.anims);
 
         //Mapa
 
@@ -58,7 +68,7 @@ export default class World01 extends Phaser.Scene {
 
         const ground = map.createLayer("Ground", tileset);
         const walls = map.createLayer("Walls", tileset);
-
+        this.physics.world.setBounds(105, 115, 1154, 1140, true, true, true, true);
         walls.setCollisionByProperty({ collide: true });
 
         //Añadir personaje y armas al mapa
@@ -69,6 +79,7 @@ export default class World01 extends Phaser.Scene {
 
         this.character = this.add.Lilith(width/2, height/2, "Lilith");
         this.character.setWeapon(this.knives);
+        this.physics.world.wrap(this.character);
 
         sceneEvents.on(
             "enemy-killed",
@@ -97,6 +108,22 @@ export default class World01 extends Phaser.Scene {
             },
         });
 
+        this.slimes = this.physics.add.group({
+            classType: Slime,
+            createCallback: (go) => {
+                const slime = go as Slime;
+                slime.body.onCollide = true;
+            },
+        });
+
+        this.lamias = this.physics.add.group({
+            classType: Lamia,
+            createCallback: (go) => {
+                const lamia = go as Lamia;
+                lamia.body.onCollide = true;
+            },
+        });
+
         // Programación de la generación de enemigos
 
         this.input.keyboard.on('keydown-' + 'ENTER', () => {
@@ -109,7 +136,7 @@ export default class World01 extends Phaser.Scene {
                 this.enemySpawner = this.time.addEvent({
                     delay: 1000,
                     callback: () => {
-                        var rand = Math.round(Math.random() * 1);
+                        var rand = Math.round(Math.random() * 3);
                         console.log(rand);
                         switch (rand) {
                             case 1:
@@ -133,16 +160,26 @@ export default class World01 extends Phaser.Scene {
                                 console.log('spawned Skeleton');
                                 break;
                             case 2:
+                                this.slimes
+                                    .get(
+                                        (1154 * Math.random()) + 105,
+                                        (1140 * Math.random()) + 115,
+                                        "Slime"
+                                    )
+                                    .setTarget(this.character)
+                                console.log('spawned Slime');
                                 break;
                             case 3:
+                                this.lamias
+                                    .get(
+                                        (1154 * Math.random()) + 105,
+                                        (1140 * Math.random()) + 115,
+                                        "Lamia"
+                                    )
+                                    .setTarget(this.character)
+                                console.log('spawned Lamia');
                                 break;
                             case 4:
-                                break;
-                            case 5:
-                                break;
-                            case 6:
-                                break;
-                            case 7:
                                 break;
                             default:
                                 break;
@@ -173,6 +210,9 @@ export default class World01 extends Phaser.Scene {
         this.physics.add.collider(this.character, walls);
         this.physics.add.collider(this.thieves, walls);
         this.physics.add.collider(this.skeletons, walls);
+        this.physics.add.collider(this.slimes, walls);
+        this.physics.add.collider(this.lamias, walls);
+
         this.physics.add.collider(
             this.knives,
             walls,
@@ -194,6 +234,20 @@ export default class World01 extends Phaser.Scene {
             undefined,
             this
         );
+        this.physics.add.collider(
+            this.slimes,
+            this.knives,
+            this.onKnifeEnemyCollision,
+            undefined,
+            this
+        );
+        this.physics.add.collider(
+            this.lamias,
+            this.knives,
+            this.onKnifeEnemyCollision,
+            undefined,
+            this
+        );
 
         this.thiefLiliColl = this.physics.add.collider(
             this.thieves,
@@ -209,14 +263,31 @@ export default class World01 extends Phaser.Scene {
             undefined,
             this
         );
+        this.slimeLiliColl = this.physics.add.collider(
+            this.slimes,
+            this.character,
+            this.onEnemyHit,
+            undefined,
+            this
+        );
+        this.lamiaLiliColl = this.physics.add.collider(
+            this.lamias,
+            this.character,
+            this.onEnemyHit,
+            undefined,
+            this
+        );
 
         this.characterCollisions.push(this.thiefLiliColl);
         this.characterCollisions.push(this.skeletonLiliColl);
-        this.characterCollisions.push(this.thiefLiliColl);
+        this.characterCollisions.push(this.slimeLiliColl);
+        this.characterCollisions.push(this.lamiaLiliColl);
 
         var mistyStep = this.input.keyboard.on('keydown-SHIFT', ()=>{
             var lilith = this.character as Lilith
-            lilith.mistyStep(lilith.lastDirection());
+            if (lilith.healthState() === Status.DEAD)
+                return
+            lilith.mistyStep(lilith.lastDirection(), this.physics.world);
         });
 
         // Manejo de la cámara
@@ -299,6 +370,18 @@ export default class World01 extends Phaser.Scene {
         if (this.skeletons.children) {
             this.skeletons.getChildren().forEach((skeleton) => {
                 skeleton.update();
+            });
+        }
+
+        if (this.slimes.children) {
+            this.slimes.getChildren().forEach((slime) => {
+                slime.update();
+            });
+        }
+
+        if (this.lamias.children) {
+            this.lamias.getChildren().forEach((lamia) => {
+                lamia.update();
             });
         }
     }

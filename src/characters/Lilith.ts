@@ -146,7 +146,7 @@ export default class Lilith extends Character implements ICaster {
         }
     }
 
-    mistyStep(dir: string) {
+    mistyStep(dir: string, worldBound: Phaser.Physics.Arcade.World) {
         this.mistyStepPlaying = true;
         if(dir === 'left'){
             this.setFlipX(true)
@@ -159,16 +159,28 @@ export default class Lilith extends Character implements ICaster {
             this.anims.play('appear', true)
             switch(dir) {
                 case 'right':
+                    if(!(this.x + 100 > worldBound.bounds.right))
                     this.setPosition(this.x + 100, this.y);
+                    else if(!(this.x + 50 > worldBound.bounds.right))
+                    this.setPosition(this.x + 50, this.y);
                     break;
                 case 'left':
+                    if(!(this.x - 100 < worldBound.bounds.left))
                     this.setPosition(this.x - 100, this.y);
+                    else if(!(this.x - 50 < worldBound.bounds.left))
+                    this.setPosition(this.x - 50, this.y);
                     break;
                 case 'up':
+                    if(!(this.y - 100 < worldBound.bounds.top))
                     this.setPosition(this.x, this.y - 100);
+                    else if(!(this.y - 50 > worldBound.bounds.top))
+                    this.setPosition(this.x, this.y - 50);
                     break;
                 case 'down':
+                    if(!(this.y + 100 > worldBound.bounds.bottom))
                     this.setPosition(this.x, this.y + 100);
+                    else if(!(this.y + 50 > worldBound.bounds.bottom))
+                    this.setPosition(this.x, this.y + 50);
                     break;
             }
             this.once('animationcomplete', () => {
