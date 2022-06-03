@@ -4,6 +4,12 @@ export enum Status{
     DEAD
 }
 
+export enum Ailments{
+    NONE,
+    POISONED,
+    PETRIFIED
+}
+
 export enum Direction {
     UP,
     DOWN,
@@ -11,3 +17,4 @@ export enum Direction {
     RIGHT,
     STOP
 }
+

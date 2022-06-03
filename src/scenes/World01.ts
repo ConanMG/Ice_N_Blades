@@ -12,11 +12,12 @@ import { HealthBar } from "~/utils/Healthbar";
 import { Enemy } from "~/enemies/Enemies";
 import Skeleton from "~/enemies/Skeleton";
 import { createSkeletonAnims } from "~/anims/SkeletonAnims";
-import { Status } from "~/utils/Predet";
+import { Ailments, Status } from "~/utils/Enums";
 import Slime from "~/enemies/Slime";
 import { createSlimeAnims } from "~/anims/SlimeAnims";
 import { createLamiaAnims } from "~/anims/LamiaAnims";
 import Lamia from "~/enemies/Lamia";
+import { once } from "events";
 
 export default class World01 extends Phaser.Scene {
     private characterCollisions: Array<Phaser.Physics.Arcade.Collider> = new Array<Phaser.Physics.Arcade.Collider>()
@@ -52,7 +53,7 @@ export default class World01 extends Phaser.Scene {
         this.scene.run("World01_UI");
 
         const { width, height } = this.scale;
-    
+
         //Animaciones
 
         createMainCharAnims(this.anims);
@@ -77,7 +78,7 @@ export default class World01 extends Phaser.Scene {
             classType: Phaser.Physics.Arcade.Image,
         });
 
-        this.character = this.add.Lilith(width/2, height/2, "Lilith");
+        this.character = this.add.Lilith(width / 2, height / 2, "Lilith");
         this.character.setWeapon(this.knives);
         this.physics.world.wrap(this.character);
 
@@ -283,9 +284,9 @@ export default class World01 extends Phaser.Scene {
         this.characterCollisions.push(this.slimeLiliColl);
         this.characterCollisions.push(this.lamiaLiliColl);
 
-        var mistyStep = this.input.keyboard.on('keydown-SHIFT', ()=>{
+        var mistyStep = this.input.keyboard.on('keydown-SHIFT', () => {
             var lilith = this.character as Lilith
-            if (lilith.healthState() === Status.DEAD)
+            if (lilith.healthState() === Status.DEAD || lilith.statusAilment() === Ailments.PETRIFIED)
                 return
             lilith.mistyStep(lilith.lastDirection(), this.physics.world);
         });
@@ -321,9 +322,9 @@ export default class World01 extends Phaser.Scene {
         player: Phaser.GameObjects.GameObject,
         attacker: Phaser.GameObjects.GameObject
     ) {
-        if(this._dodgeActive)
+        if (this._dodgeActive)
             return
-        
+
         const enemy = attacker as Enemy;
 
         const dx = this.character.x - enemy.x;
@@ -331,24 +332,40 @@ export default class World01 extends Phaser.Scene {
 
         const dir = new Phaser.Math.Vector2(dx, dy).normalize().scale(200);
 
+        if (enemy instanceof Lamia) {
+            if (this.character.statusAilment() != Ailments.PETRIFIED) {
+                let probability = Math.random() * 100;
+                if (probability >= 80)
+                    this.character.setStatusAilment(Ailments.PETRIFIED);
+            }
+        }
+        if (enemy instanceof Slime) {
+            if (this.character.statusAilment() != Ailments.POISONED) {
+                let probability = Math.random() * 100;
+                if (probability >= 80)
+                    this.character.setStatusAilment(Ailments.POISONED);
+            }
+        }
+
         enemy.onPlayerCollision(dir);
         this.character.onHit(dir, enemy.damage());
         sceneEvents.emit("player-took-damage", this.character.hp());
 
-        if (this.character.hp() <= 0 && this.character.healthState() != Status.DEAD) {
-            sceneEvents.emit("player-died");
-        }
     }
 
     update() {
 
+        if (this.character.hp() <= 0 && this.character.healthState() != Status.DEAD) {
+            sceneEvents.emit("player-died");
+        }
+
         this._dodgeActive = (this.character as Lilith).mistyStepPlaying;
 
-        if(this.character.healthState() != Status.DEAD){
-            if(this._dodgeActive){
+        if (this.character.healthState() != Status.DEAD) {
+            if (this._dodgeActive) {
                 this.character.body.enable = false
             }
-            else{
+            else {
                 this.character.body.enable = true
             }
         }

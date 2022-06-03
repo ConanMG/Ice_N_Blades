@@ -1,7 +1,7 @@
-import Phaser from "phaser";
+import Phaser, { Time } from "phaser";
 import { sceneEvents } from "~/events/EventManager";
 import { HealthBar } from "~/utils/Healthbar";
-import { Direction, Status } from "~/utils/Predet";
+import { Direction, Status, Ailments } from "~/utils/Enums";
 
 export abstract class Character extends Phaser.Physics.Arcade.Sprite {
 
@@ -10,6 +10,8 @@ export abstract class Character extends Phaser.Physics.Arcade.Sprite {
     protected _hp!: number;
     protected _speed: any;
     protected _healthState!: Status;
+    protected _statusAilments!: Ailments;
+    private _inmune: boolean = false;
     protected _skills!: Map<string, number>
     protected _cooldowns!: Map<string, number>
     protected _ac!: number;
@@ -23,8 +25,9 @@ export abstract class Character extends Phaser.Physics.Arcade.Sprite {
     protected _skillPoints!: number;
 
     protected _damageTime: number = 0;
-    protected _lastDirection!: string;
+    protected _lastDirection!: Direction;
     protected _healthBar!: HealthBar;
+    protected _poisonEvent!: Phaser.Time.TimerEvent;
 
     public hp() {
         return this._hp;
@@ -79,6 +82,15 @@ export abstract class Character extends Phaser.Physics.Arcade.Sprite {
     }
     public lastDirection(){
         return this._lastDirection;
+    }
+    public statusAilment(){
+        return this._statusAilments;
+    }
+    public setStatusAilment(ailment: Ailments){
+        this._statusAilments = ailment
+    }
+    public poisonEvent(){
+        return this._poisonEvent;
     }
 
     checkXp() {
@@ -233,6 +245,48 @@ export abstract class Character extends Phaser.Physics.Arcade.Sprite {
             return;
         }
 
+        switch(this._statusAilments){
+            case Ailments.NONE:
+                break;
+            case Ailments.PETRIFIED:
+                if(this._inmune)
+                    break;
+                this.setVelocity(0, 0);
+                this.setTintFill(Phaser.Display.Color.GetColor(102, 102, 102));
+                this.anims.pause();
+                setTimeout(()=>{
+                    this.setTint(0xffffff);
+                    this.anims.resume();
+                    this._statusAilments = Ailments.NONE;
+                    this._inmune = true;
+                    setTimeout(() => {
+                        this._inmune = false;
+                    }, 1500)
+                }, 2000)
+                return;
+            case Ailments.POISONED:
+                if(this._poisonEvent && this._poisonEvent.getOverallRemaining() > 0)
+                    break;
+                this.setVelocity(this._speed);
+                this._speed = (this._skills['dex'] + 100) / 1.2;
+                this._poisonEvent = this.scene.time.addEvent({
+                    delay: 1000,
+                    callback: () => {
+                        this._hp = this._hp - 1;
+                        this.setTint(Phaser.Display.Color.GetColor(78, 165, 26))
+                        setTimeout(() => {
+                            this.setTint(0xffffff);
+                        }, 300)
+                        console.log(this._poisonEvent.getOverallRemaining())
+                        if(this._poisonEvent.getOverallRemaining() <= 0){
+                            this._statusAilments = Ailments.NONE;
+                        }
+                    },
+                    repeat: 4
+                })
+                break;
+        }
+
         this.checkXp();
 
         if (this._healthState === Status.DAMAGED) {
@@ -255,34 +309,34 @@ export abstract class Character extends Phaser.Physics.Arcade.Sprite {
                     this.setVelocityX(-this._speed);
                     this.setVelocityY(0);
                     this.anims.play('left', true);
-                    this._lastDirection = this.anims.currentAnim.key;
+                    this._lastDirection = Direction.LEFT;
             } else if (cursors.right.isDown) {
                     this.setFlipX(false);
                     this.setVelocityX(this._speed);
                     this.setVelocityY(0);
                     this.anims.play('right', true);
-                    this._lastDirection = this.anims.currentAnim.key;
+                    this._lastDirection = Direction.RIGHT;
             } else if (cursors.down.isDown) {
                     this.setFlipX(false);
                     this.setVelocityY(this._speed);
                     this.setVelocityX(0);
                     this.anims.play('down', true);
-                    this._lastDirection = this.anims.currentAnim.key;
+                    this._lastDirection = Direction.DOWN;
             } else if (cursors.up.isDown) {
                     this.setFlipX(false);
                     this.setVelocityY(-this._speed);
                     this.setVelocityX(0);
                     this.anims.play('up', true);
-                    this._lastDirection = this.anims.currentAnim.key;
+                    this._lastDirection = Direction.UP;
             } else {
                 this.setVelocityX(0);
                 this.setVelocityY(0);
 
                 switch (this._lastDirection) {
-                    case 'right' || 'up':
+                    case Direction.RIGHT || Direction.UP:
                         this.setFlipX(false)
                         break;
-                    case 'left' || 'down':
+                    case Direction.LEFT || Direction.DOWN:
                         this.setFlipX(true)
                         break;
                     default:
@@ -293,6 +347,7 @@ export abstract class Character extends Phaser.Physics.Arcade.Sprite {
                 this.play('idle', true)
             }
         }
+        console.log(this._hp);
         this._healthBar.draw(this.x - 9, this.y - 18, this._hp)
 
     }

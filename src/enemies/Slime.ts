@@ -1,5 +1,5 @@
 import Phaser from "phaser";
-import { Direction, Status } from "~/utils/Predet";
+import { Direction, Status } from "~/utils/Enums";
 import { Enemy } from "./Enemies";
 
 const randomDirection = (exclude:Direction)=>{

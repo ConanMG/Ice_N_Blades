@@ -1,6 +1,6 @@
 import Phaser from "phaser";
 import IBoss from "~/interfaces/IBoss";
-import { Direction } from "~/utils/Predet";
+import { Direction } from "~/utils/Enums";
 import { Enemy } from "./Enemies";
 
 const movementPattern = (exclude:Direction)=>{

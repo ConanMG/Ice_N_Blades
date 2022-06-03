@@ -1,7 +1,7 @@
 import Phaser from "phaser";
 import { Character } from "~/characters/Character";
 import { sceneEvents } from "~/events/EventManager";
-import { Direction, Status } from "~/utils/Predet";
+import { Direction, Status } from "~/utils/Enums";
 
 export abstract class Enemy extends Phaser.Physics.Arcade.Sprite {
 

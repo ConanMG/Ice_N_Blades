@@ -1,7 +1,7 @@
 import Phaser, { Tilemaps } from "phaser";
 import { sceneEvents } from "~/events/EventManager";
 import ICaster from "~/interfaces/ICaster";
-import { Status } from "~/utils/Predet"
+import { Ailments, Direction, Status } from "~/utils/Enums"
 import { Character } from "./Character";
 
 declare global{
@@ -71,22 +71,22 @@ export default class Lilith extends Character implements ICaster {
 
     attack(){
 
-        if(!this._weapon){
+        if(!this._weapon || this._statusAilments === Ailments.PETRIFIED || this._healthState === Status.DEAD){
             return
         }
         const vec = new Phaser.Math.Vector2(0,0)
 
         switch(this._lastDirection){
-            case 'down':
+            case Direction.DOWN:
                 vec.y = 1
             break;
-            case 'up':
+            case Direction.UP:
                 vec.y = -1
             break;
-            case 'left':
+            case Direction.LEFT:
                 vec.x = -1
             break;
-            case 'right':
+            case Direction.RIGHT:
                 vec.x = 1
             break;
             default:
@@ -146,9 +146,9 @@ export default class Lilith extends Character implements ICaster {
         }
     }
 
-    mistyStep(dir: string, worldBound: Phaser.Physics.Arcade.World) {
+    mistyStep(dir: Direction, worldBound: Phaser.Physics.Arcade.World) {
         this.mistyStepPlaying = true;
-        if(dir === 'left'){
+        if(dir === Direction.LEFT){
             this.setFlipX(true)
         }
 
@@ -158,25 +158,25 @@ export default class Lilith extends Character implements ICaster {
             console.log(dir)
             this.anims.play('appear', true)
             switch(dir) {
-                case 'right':
+                case Direction.RIGHT:
                     if(!(this.x + 100 > worldBound.bounds.right))
                     this.setPosition(this.x + 100, this.y);
                     else if(!(this.x + 50 > worldBound.bounds.right))
                     this.setPosition(this.x + 50, this.y);
                     break;
-                case 'left':
+                case Direction.LEFT:
                     if(!(this.x - 100 < worldBound.bounds.left))
                     this.setPosition(this.x - 100, this.y);
                     else if(!(this.x - 50 < worldBound.bounds.left))
                     this.setPosition(this.x - 50, this.y);
                     break;
-                case 'up':
+                case Direction.UP:
                     if(!(this.y - 100 < worldBound.bounds.top))
                     this.setPosition(this.x, this.y - 100);
                     else if(!(this.y - 50 > worldBound.bounds.top))
                     this.setPosition(this.x, this.y - 50);
                     break;
-                case 'down':
+                case Direction.DOWN:
                     if(!(this.y + 100 > worldBound.bounds.bottom))
                     this.setPosition(this.x, this.y + 100);
                     else if(!(this.y + 50 > worldBound.bounds.bottom))

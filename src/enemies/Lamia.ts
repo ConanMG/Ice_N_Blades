@@ -1,6 +1,6 @@
 import Phaser from "phaser";
 import ICaster from "~/interfaces/ICaster";
-import { Status } from "~/utils/Predet";
+import { Status } from "~/utils/Enums";
 import { Enemy } from "./Enemies";
 
 export default class Succubus extends Enemy{
