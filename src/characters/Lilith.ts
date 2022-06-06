@@ -173,7 +173,7 @@ export default class Lilith extends Character implements ICaster {
                 case Direction.UP:
                     if(!(this.y - 100 < worldBound.bounds.top))
                     this.setPosition(this.x, this.y - 100);
-                    else if(!(this.y - 50 > worldBound.bounds.top))
+                    else if(!(this.y - 50 < worldBound.bounds.top))
                     this.setPosition(this.x, this.y - 50);
                     break;
                 case Direction.DOWN:

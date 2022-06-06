@@ -12,8 +12,8 @@ const createMindflayerAnims = (anims: Phaser.Animations.AnimationManager)=>{
     );
     anims.create(
         {
-            key: 'mindflayer_run',
-            frames: anims.generateFrameNames('Mindflayer', { prefix: 'Run', end: 7, zeroPad: 4 }),
+            key: 'mindflayer_move',
+            frames: anims.generateFrameNames('Mindflayer', { prefix: 'Move', end: 3, zeroPad: 4 }),
             frameRate: 12,
             repeat: -1
         }
@@ -21,11 +21,12 @@ const createMindflayerAnims = (anims: Phaser.Animations.AnimationManager)=>{
     anims.create(
         {
             key: 'mindflayer_attack',
-            frames: anims.generateFrameNames('Mindflayer', { prefix: 'Attack', end: 2, zeroPad: 4 }),
+            frames: anims.generateFrameNames('Mindflayer', { prefix: 'Attack', end: 3, zeroPad: 4 }),
             frameRate: 12,
             repeat: 0
         }
     );
+    /*
     anims.create(
         {
             key: 'mindflayer_extract_brain',
@@ -42,6 +43,7 @@ const createMindflayerAnims = (anims: Phaser.Animations.AnimationManager)=>{
             repeat: 0
         }
     );
+    */
     anims.create(
         {
             key: 'mindflayer_hurt',
@@ -53,8 +55,8 @@ const createMindflayerAnims = (anims: Phaser.Animations.AnimationManager)=>{
     anims.create(
         {
             key: 'mindflayer_death',
-            frames: anims.generateFrameNames('Mindflayer', { prefix: 'Death', end: 4, zeroPad: 4 }),
-            frameRate: 12,
+            frames: anims.generateFrameNames('Mindflayer', { prefix: 'Death', end: 8, zeroPad: 4 }),
+            frameRate: 15,
             repeat: 0
         }
     );
@@ -62,5 +64,5 @@ const createMindflayerAnims = (anims: Phaser.Animations.AnimationManager)=>{
 }
 
 export{
-    createMindflayerAnims as createThiefAnims
+    createMindflayerAnims as createMindflayerAnims
 }

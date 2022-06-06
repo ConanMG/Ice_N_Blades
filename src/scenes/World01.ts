@@ -18,6 +18,15 @@ import { createSlimeAnims } from "~/anims/SlimeAnims";
 import { createLamiaAnims } from "~/anims/LamiaAnims";
 import Lamia from "~/enemies/Lamia";
 import { once } from "events";
+import Mindflayer from "~/enemies/Mindflayer";
+import { createMindflayerAnims } from "~/anims/MindflayerAnims";
+import { createTrollAnims } from "~/anims/TrollAnims";
+import Troll from "~/enemies/Troll";
+import { createGhostAnims } from "~/anims/GhostAnims";
+import Ghost from "~/enemies/Ghost";
+import { createFireboltAnims } from "~/anims/Firebolt";
+import { Character } from "~/characters/Character";
+import { Vector } from "matter";
 
 export default class World01 extends Phaser.Scene {
     private characterCollisions: Array<Phaser.Physics.Arcade.Collider> = new Array<Phaser.Physics.Arcade.Collider>()
@@ -25,14 +34,21 @@ export default class World01 extends Phaser.Scene {
     private skeletonLiliColl!: Phaser.Physics.Arcade.Collider;
     private slimeLiliColl!: Phaser.Physics.Arcade.Collider;
     private lamiaLiliColl!: Phaser.Physics.Arcade.Collider;
+    private mindflayerLiliColl!: Phaser.Physics.Arcade.Collider;
+    private trollLiliColl!: Phaser.Physics.Arcade.Collider;
+    private ghostLiliColl!: Phaser.Physics.Arcade.Collider;
     private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
 
     private character!: Lilith;
     private knives!: Phaser.Physics.Arcade.Group;
+    private firebolts!: Phaser.Physics.Arcade.Group;
     private thieves!: Phaser.Physics.Arcade.Group;
     private skeletons!: Phaser.Physics.Arcade.Group;
     private slimes!: Phaser.Physics.Arcade.Group;
     private lamias!: Phaser.Physics.Arcade.Group;
+    private mindflayers!: Phaser.Physics.Arcade.Group;
+    private trolls!: Phaser.Physics.Arcade.Group;
+    private ghosts!: Phaser.Physics.Arcade.Group;
 
     private enemySpawner!: Phaser.Time.TimerEvent;
     private waveLength: number = 10;
@@ -40,6 +56,7 @@ export default class World01 extends Phaser.Scene {
     private nextWave: Boolean = true;
     private waveOngoing: boolean = false;
     private _dodgeActive: boolean = false;
+    private _enemiesLevel: number = -1;
 
     constructor() {
         super({ key: "World01" });
@@ -61,8 +78,12 @@ export default class World01 extends Phaser.Scene {
         createSkeletonAnims(this.anims);
         createSlimeAnims(this.anims);
         createLamiaAnims(this.anims);
+        createMindflayerAnims(this.anims);
+        createTrollAnims(this.anims);
+        createGhostAnims(this.anims);
+        createFireboltAnims(this.anims);
 
-        //Mapa
+        //Creación de mapa y separación del mismo en capas
 
         var map = this.make.tilemap({ key: "map" });
         var tileset = map.addTilesetImage("stygia", "tiles", 16, 16, 0, 0);
@@ -92,6 +113,10 @@ export default class World01 extends Phaser.Scene {
         );
 
         //Crear los grupos de enemigos
+
+        this.firebolts = this.physics.add.group({
+            classType: Phaser.Physics.Arcade.Sprite,
+        });
 
         this.thieves = this.physics.add.group({
             classType: Thief,
@@ -125,6 +150,30 @@ export default class World01 extends Phaser.Scene {
             },
         });
 
+        this.mindflayers = this.physics.add.group({
+            classType: Mindflayer,
+            createCallback: (go) => {
+                const mindflayer = go as Mindflayer;
+                mindflayer.body.onCollide = true;
+            },
+        });
+
+        this.trolls = this.physics.add.group({
+            classType: Troll,
+            createCallback: (go) => {
+                const troll = go as Troll;
+                troll.body.onCollide = true;
+            },
+        });
+
+        this.ghosts = this.physics.add.group({
+            classType: Ghost,
+            createCallback: (go) => {
+                const ghost = go as Ghost;
+                ghost.body.onCollide = true;
+            },
+        });
+
         // Programación de la generación de enemigos
 
         this.input.keyboard.on('keydown-' + 'ENTER', () => {
@@ -133,14 +182,19 @@ export default class World01 extends Phaser.Scene {
                 console.log("registered event")
                 sceneEvents.emit('wave-started', this.waveLength)
                 this.waveOngoing = true;
+                this._enemiesLevel += 2;
 
                 this.enemySpawner = this.time.addEvent({
                     delay: 1000,
                     callback: () => {
-                        var rand = Math.round(Math.random() * 3);
-                        console.log(rand);
-                        switch (rand) {
-                            case 1:
+                        var spawnableEnemies;
+                        if (this._enemiesLevel > 6)
+                            spawnableEnemies = 6
+                        else
+                            spawnableEnemies = this._enemiesLevel;
+
+                        switch (Math.round(Math.random() * spawnableEnemies)) {
+                            case 0:
                                 this.thieves
                                     .get(
                                         (1154) * Math.random() + 105,
@@ -150,7 +204,17 @@ export default class World01 extends Phaser.Scene {
                                     .setTarget(this.character);
                                 console.log('spawned Thief');
                                 break;
-                            case 0:
+                            case 1:
+                                this.ghosts
+                                    .get(
+                                        (1154 * Math.random()) + 105,
+                                        (1140 * Math.random()) + 115,
+                                        "Ghost"
+                                    )
+                                    .setTarget(this.character);
+                                console.log('spawned Ghost');
+                                break;
+                            case 2:
                                 this.skeletons
                                     .get(
                                         (1154 * Math.random()) + 105,
@@ -160,7 +224,7 @@ export default class World01 extends Phaser.Scene {
                                     .setTarget(this.character);
                                 console.log('spawned Skeleton');
                                 break;
-                            case 2:
+                            case 3:
                                 this.slimes
                                     .get(
                                         (1154 * Math.random()) + 105,
@@ -170,7 +234,17 @@ export default class World01 extends Phaser.Scene {
                                     .setTarget(this.character)
                                 console.log('spawned Slime');
                                 break;
-                            case 3:
+                            case 4:
+                                this.mindflayers
+                                    .get(
+                                        (1154 * Math.random()) + 105,
+                                        (1140 * Math.random()) + 115,
+                                        "Mindflayer"
+                                    )
+                                    .setTarget(this.character)
+                                console.log('spawned Mindflayer');
+                                break;
+                            case 5:
                                 this.lamias
                                     .get(
                                         (1154 * Math.random()) + 105,
@@ -180,7 +254,15 @@ export default class World01 extends Phaser.Scene {
                                     .setTarget(this.character)
                                 console.log('spawned Lamia');
                                 break;
-                            case 4:
+                            case 6:
+                                this.trolls
+                                    .get(
+                                        (1154 * Math.random()) + 105,
+                                        (1140 * Math.random()) + 115,
+                                        "Troll"
+                                    )
+                                    .setTarget(this.character)
+                                console.log('spawned Troll');
                                 break;
                             default:
                                 break;
@@ -213,6 +295,8 @@ export default class World01 extends Phaser.Scene {
         this.physics.add.collider(this.skeletons, walls);
         this.physics.add.collider(this.slimes, walls);
         this.physics.add.collider(this.lamias, walls);
+        this.physics.add.collider(this.mindflayers, walls);
+        this.physics.add.collider(this.trolls, walls);
 
         this.physics.add.collider(
             this.knives,
@@ -249,6 +333,34 @@ export default class World01 extends Phaser.Scene {
             undefined,
             this
         );
+        this.physics.add.collider(
+            this.mindflayers,
+            this.knives,
+            this.onKnifeEnemyCollision,
+            undefined,
+            this
+        );
+        this.physics.add.collider(
+            this.trolls,
+            this.knives,
+            this.onKnifeEnemyCollision,
+            undefined,
+            this
+        );
+        this.physics.add.collider(
+            this.ghosts,
+            this.knives,
+            this.onKnifeEnemyCollision,
+            undefined,
+            this
+        );
+        this.physics.add.collider(
+            this.character,
+            this.firebolts,
+            this.onMagicLilithCollision,
+            undefined,
+            this
+        );
 
         this.thiefLiliColl = this.physics.add.collider(
             this.thieves,
@@ -278,11 +390,35 @@ export default class World01 extends Phaser.Scene {
             undefined,
             this
         );
+        this.mindflayerLiliColl = this.physics.add.collider(
+            this.mindflayers,
+            this.character,
+            this.onEnemyHit,
+            undefined,
+            this
+        );
+        this.trollLiliColl = this.physics.add.collider(
+            this.trolls,
+            this.character,
+            this.onEnemyHit,
+            undefined,
+            this
+        );
+        this.ghostLiliColl = this.physics.add.collider(
+            this.ghosts,
+            this.character,
+            this.onEnemyHit,
+            undefined,
+            this
+        );
 
         this.characterCollisions.push(this.thiefLiliColl);
         this.characterCollisions.push(this.skeletonLiliColl);
         this.characterCollisions.push(this.slimeLiliColl);
         this.characterCollisions.push(this.lamiaLiliColl);
+        this.characterCollisions.push(this.mindflayerLiliColl);
+        this.characterCollisions.push(this.trollLiliColl);
+        this.characterCollisions.push(this.ghostLiliColl);
 
         var mistyStep = this.input.keyboard.on('keydown-SHIFT', () => {
             var lilith = this.character as Lilith
@@ -295,6 +431,7 @@ export default class World01 extends Phaser.Scene {
         this.cameras.main.startFollow(this.character, true, 1, 1);
         this.cameras.main.centerOn(this.character.x, this.character.y);
         this.cameras.main.zoom = 3;
+        this.cameras.main.setDeadzone(100, 100)
     }
 
     private onKnifeWallCollision(
@@ -316,6 +453,18 @@ export default class World01 extends Phaser.Scene {
         enemy.onHit(this.character.damage());
 
         knife.destroy();
+    }
+
+    private onMagicLilithCollision(
+        obj1: Phaser.GameObjects.GameObject,
+        firebolt: Phaser.GameObjects.GameObject
+    ) {
+        var charac = obj1 as Character;
+        this.firebolts.killAndHide(firebolt);
+
+        charac.onHit(8);
+
+        firebolt.destroy();
     }
 
     private onEnemyHit(
@@ -348,7 +497,7 @@ export default class World01 extends Phaser.Scene {
         }
 
         enemy.onPlayerCollision(dir);
-        this.character.onHit(dir, enemy.damage());
+        this.character.onHit(enemy.damage(), dir);
         sceneEvents.emit("player-took-damage", this.character.hp());
 
     }
@@ -399,6 +548,30 @@ export default class World01 extends Phaser.Scene {
         if (this.lamias.children) {
             this.lamias.getChildren().forEach((lamia) => {
                 lamia.update();
+            });
+        }
+
+        if (this.mindflayers.children) {
+            this.mindflayers.getChildren().forEach((mindflayer) => {
+                mindflayer.update();
+            });
+        }
+
+        if (this.trolls.children) {
+            this.trolls.getChildren().forEach((troll) => {
+                troll.update();
+            });
+        }
+
+        if (this.ghosts.children) {
+            this.ghosts.getChildren().forEach((ghost) => {
+                ghost.update();
+            });
+        }
+
+        if (this.firebolts.children) {
+            this.firebolts.getChildren().forEach((firebolt) => {
+                firebolt.update();
             });
         }
     }

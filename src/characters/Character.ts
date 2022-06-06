@@ -182,12 +182,14 @@ export abstract class Character extends Phaser.Physics.Arcade.Sprite {
         this._skillPoints += 2;
     }
 
-    onHit(dir: Phaser.Math.Vector2, damage: number) {
+    onHit(damage: number, dir?: Phaser.Math.Vector2) {
         if (this._healthState != Status.HEALTHY) {
             return;
         }
 
-        this.setVelocity(dir.x, dir.y);
+        if(dir){
+            this.setVelocity(dir.x, dir.y);
+        }
         this.setTint(0xff0000);
         this._healthState = Status.DAMAGED;
         this._damageTime = 0;

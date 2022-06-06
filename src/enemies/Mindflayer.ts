@@ -1,6 +1,7 @@
 import Phaser from "phaser";
 import { sceneEvents } from "~/events/EventManager";
 import ICaster from "~/interfaces/ICaster";
+import { Status } from "~/utils/Enums";
 import { Enemy } from "./Enemies";
 
 export default class Mindflayer extends Enemy implements ICaster{
@@ -20,9 +21,13 @@ export default class Mindflayer extends Enemy implements ICaster{
         this.spells.push('Extract Brain');
         this.spells.push('Mind Blast');
 
+        this._healthState = Status.HEALTHY;
     }
 
     castSpell(spellKey: string) {
+
+        //TODO
+        throw new Error('Method not implemented.');
 
         switch(spellKey){
             case 'Extract Brain':
@@ -57,20 +62,71 @@ export default class Mindflayer extends Enemy implements ICaster{
         }
     }
 
-    preUpdate(time: number, delta: number) {
-        super.preUpdate(time, delta)
-        
-        if (this._gameOver || this._justHit){
+    onPlayerCollision(dir: Phaser.Math.Vector2): void {
+        this.anims.play('mindflayer_attack')
+        super.onPlayerCollision(dir)
+    }
+
+    preUpdate(time: number, delta: number){
+        super.preUpdate(time, delta);
+
+        if (this._gameOver || this._justHit) {
+            return; 
+        }
+
+        switch(this._healthState){
+
+            case Status.HEALTHY:
+                this.setAggro();
+                if(this.body.velocity.x > 0 ){
+                    this.anims.play('mindflayer_move', true)
+                    this.flipX = false;
+                }
+                else if(this.body.velocity.x < 0){
+                    this.anims.play('mindflayer_move', true)
+                    this.flipX = true;
+                }
+                else{
+                    this.anims.play('mindflayer_idle', true)
+                }
+                this.setTint(0xffffff);
+                this._damageTime = 0;
+                break;
+            case Status.DAMAGED:
+                this.setVelocity(0)
+                this.setTint(0xff0000);
+                this.anims.play('mindflayer_hurt', true);
+                this.on('animationcomplete', ()=>{
+                    this._healthState = Status.HEALTHY;
+                })
+                this.setAggro();
+                break;
+            case Status.DEAD:
+                this.setAggro();
+                this.setVelocity(0);
+                this._gameOver = true;
+                this.body.onCollide = false;
+                this.anims.stop()
+                this.anims.play('mindflayer_death', true);
+                this.once('animationcomplete', () => {
+                        this.destroy();
+                })
+                break;
+        }
+    }
+
+    update() {
+
+        super.update()
+
+        if(this._justHit || this._gameOver || this.anims.currentAnim === this.anims.get('mindflayer_attack'))
             return;
-        }
 
-        if (this._aggro){
-            if (this.cooldown === 0) {
-                let length = Math.random() * this.spells.length;
-                this.castSpell(this.spells[length]);
-            }
+        if(this._aggro)
+            this.scene.physics.moveToObject(this, this._target!, this._speed)
+        else{
+            this.setVelocity(0,0)
         }
-
     }
 
 
