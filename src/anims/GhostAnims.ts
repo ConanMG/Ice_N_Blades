@@ -6,7 +6,7 @@ const createGhostAnims = (anims: Phaser.Animations.AnimationManager)=>{
         {
             key: 'ghost_idle',
             frames: anims.generateFrameNames('Ghost', { prefix: 'Idle', end: 4, zeroPad: 4 }),
-            frameRate: 12,
+            frameRate: 6,
             repeat: -1
         }
     );

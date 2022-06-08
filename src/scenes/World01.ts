@@ -89,7 +89,7 @@ export default class World01 extends Phaser.Scene {
 
         const ground = map.createLayer("Ground", tileset);
         const walls = map.createLayer("Walls", tileset);
-        this.physics.world.setBounds(105, 115, 1154, 1140, true, true, true, true);
+        this.physics.world.setBounds(423, 426, 1154, 1140, true, true, true, true);
         walls.setCollisionByProperty({ collide: true });
 
         //Añadir personaje y armas al mapa
@@ -178,10 +178,6 @@ export default class World01 extends Phaser.Scene {
         this.input.keyboard.on('keydown-' + 'ESC', () =>{
             sceneEvents.emit('pause-game');
         })
-        
-        this.input.keyboard.on('keydown-' + 'R', () =>{
-            sceneEvents.emit('restart-game')
-        })
 
         this.input.keyboard.on('keydown-' + 'ENTER', () => {
 
@@ -204,8 +200,8 @@ export default class World01 extends Phaser.Scene {
                             case 0:
                                 this.thieves
                                     .get(
-                                        (1154) * Math.random() + 105,
-                                        (1140) * Math.random() + 115,
+                                        (1154) * Math.random() + 423,
+                                        (1140) * Math.random() + 426,
                                         "Thief"
                                     )
                                     .setTarget(this.character);
@@ -214,8 +210,8 @@ export default class World01 extends Phaser.Scene {
                             case 1:
                                 this.ghosts
                                     .get(
-                                        (1154 * Math.random()) + 105,
-                                        (1140 * Math.random()) + 115,
+                                        (1154 * Math.random()) + 423,
+                                        (1140 * Math.random()) + 426,
                                         "Ghost"
                                     )
                                     .setTarget(this.character);
@@ -224,8 +220,8 @@ export default class World01 extends Phaser.Scene {
                             case 2:
                                 this.skeletons
                                     .get(
-                                        (1154 * Math.random()) + 105,
-                                        (1140 * Math.random()) + 115,
+                                        (1154 * Math.random()) + 423,
+                                        (1140 * Math.random()) + 426,
                                         "Skeleton"
                                     )
                                     .setTarget(this.character);
@@ -234,8 +230,8 @@ export default class World01 extends Phaser.Scene {
                             case 3:
                                 this.slimes
                                     .get(
-                                        (1154 * Math.random()) + 105,
-                                        (1140 * Math.random()) + 115,
+                                        (1154 * Math.random()) + 423,
+                                        (1140 * Math.random()) + 426,
                                         "Slime"
                                     )
                                     .setTarget(this.character)
@@ -244,8 +240,8 @@ export default class World01 extends Phaser.Scene {
                             case 4:
                                 this.mindflayers
                                     .get(
-                                        (1154 * Math.random()) + 105,
-                                        (1140 * Math.random()) + 115,
+                                        (1154 * Math.random()) + 423,
+                                        (1140 * Math.random()) + 426,
                                         "Mindflayer"
                                     )
                                     .setTarget(this.character)
@@ -254,8 +250,8 @@ export default class World01 extends Phaser.Scene {
                             case 5:
                                 this.lamias
                                     .get(
-                                        (1154 * Math.random()) + 105,
-                                        (1140 * Math.random()) + 115,
+                                        (1154 * Math.random()) + 423,
+                                        (1140 * Math.random()) + 426,
                                         "Lamia"
                                     )
                                     .setTarget(this.character)
@@ -264,8 +260,8 @@ export default class World01 extends Phaser.Scene {
                             case 6:
                                 this.trolls
                                     .get(
-                                        (1154 * Math.random()) + 105,
-                                        (1140 * Math.random()) + 115,
+                                        (1154 * Math.random()) + 423,
+                                        (1140 * Math.random()) + 426,
                                         "Troll"
                                     )
                                     .setTarget(this.character)
@@ -283,12 +279,7 @@ export default class World01 extends Phaser.Scene {
             }
         });
 
-        sceneEvents.emit('wave-ended')
-
-        sceneEvents.on('restart-game', ()=>{
-            sceneEvents.removeAllListeners();
-            this.scene.start('preloader');
-        });
+        sceneEvents.emit('wave-ended');
 
         sceneEvents.on('player-died', () => {
             if (this.character.healthState() === Status.DEAD)
@@ -449,7 +440,7 @@ export default class World01 extends Phaser.Scene {
         this.cameras.main.startFollow(this.character, true, 1, 1);
         this.cameras.main.centerOn(this.character.x, this.character.y);
         this.cameras.main.zoom = 3;
-        this.cameras.main.setDeadzone(100, 100)
+        this.cameras.main.setDeadzone(50, 50)
     }
 
     private onKnifeWallCollision(

@@ -17,7 +17,7 @@ const config: Phaser.Types.Core.GameConfig = {
 	},
 	scene: [Preloader_World01, World01, World01_UI, PauseMenu],
 	scale:{
-        mode: Phaser.Scale.FIT,
+        mode: Phaser.Scale.RESIZE,
         parent: 'phaser-example',
         autoCenter: Phaser.Scale.CENTER_BOTH,
         width: 800,

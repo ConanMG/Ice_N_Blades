@@ -35,8 +35,6 @@ export default class World01_UI extends Phaser.Scene {
 
         var nextWave = this.add.text(screenCenterX, (screenCenterY + screenCenterY) - 48, "Press '↵ Enter' to release the horde.", { font: '2em Georgia', color: '#000000' });
         nextWave.setX(nextWave.x - nextWave.width / 2)
-        var txtRestart = this.add.text(screenCenterX, (screenCenterY + screenCenterY) - 96, "Press 'R' to restart.", { font: '2em Georgia', color: '#000000' });
-        txtRestart.setX(txtRestart.x - txtRestart.width / 2).setVisible(false);
 
         this.waveBlink = this.time.addEvent({
             delay: 500,
@@ -142,7 +140,6 @@ export default class World01_UI extends Phaser.Scene {
                     });
             }, 3000);
 
-            txtRestart.setVisible(true);
         })
 
         sceneEvents.on('player-leveled-up', () => {
