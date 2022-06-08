@@ -1,4 +1,5 @@
 import Phaser from "phaser";
+import { sceneEvents } from "~/events/EventManager";
 
 export default class World01_Preloader extends Phaser.Scene {
 
@@ -50,6 +51,7 @@ export default class World01_Preloader extends Phaser.Scene {
 
     create() {
         this.scene.start('World01')
+        this.scene.start("World01_UI");
     }
 
 }

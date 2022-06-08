@@ -67,7 +67,6 @@ export default class World01 extends Phaser.Scene {
     }
 
     create() {
-        this.scene.run("World01_UI");
 
         const { width, height } = this.scale;
 
@@ -176,6 +175,14 @@ export default class World01 extends Phaser.Scene {
 
         // Programación de la generación de enemigos
 
+        this.input.keyboard.on('keydown-' + 'ESC', () =>{
+            sceneEvents.emit('pause-game');
+        })
+        
+        this.input.keyboard.on('keydown-' + 'R', () =>{
+            sceneEvents.emit('restart-game')
+        })
+
         this.input.keyboard.on('keydown-' + 'ENTER', () => {
 
             if (!this.waveOngoing) {
@@ -192,7 +199,7 @@ export default class World01 extends Phaser.Scene {
                             spawnableEnemies = 6
                         else
                             spawnableEnemies = this._enemiesLevel;
-
+                            
                         switch (Math.round(Math.random() * spawnableEnemies)) {
                             case 0:
                                 this.thieves
@@ -278,10 +285,21 @@ export default class World01 extends Phaser.Scene {
 
         sceneEvents.emit('wave-ended')
 
+        sceneEvents.on('restart-game', ()=>{
+            sceneEvents.removeAllListeners();
+            this.scene.start('preloader');
+        });
+
         sceneEvents.on('player-died', () => {
             if (this.character.healthState() === Status.DEAD)
                 return;
             this.thiefLiliColl.destroy()
+        })
+
+        sceneEvents.on('pause-game', ()=>{
+            this.scene.launch('PauseMenu')
+            this.scene.pause(this);
+            this.scene.pause('World01_UI')
         })
 
         sceneEvents.on('wave-ended', () => {

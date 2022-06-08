@@ -1,4 +1,5 @@
 import Phaser from 'phaser'
+import PauseMenu from './scenes/PauseMenu'
 
 import World01 from './scenes/World01'
 import Preloader_World01 from './scenes/World01_Preloader'
@@ -14,7 +15,7 @@ const config: Phaser.Types.Core.GameConfig = {
 			debug: false
 		}
 	},
-	scene: [Preloader_World01, World01, World01_UI],
+	scene: [Preloader_World01, World01, World01_UI, PauseMenu],
 	scale:{
         mode: Phaser.Scale.FIT,
         parent: 'phaser-example',
