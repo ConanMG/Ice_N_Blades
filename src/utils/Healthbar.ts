@@ -39,10 +39,20 @@ export class HealthBar {
         this._bar.setVisible(true);
     }
 
+    /**
+     * Recalculates the hp in the healthbar
+     * @param newHp New amount of HP
+     */
     expandHealth(newHp: number){
         this.fullHealth = newHp;
     }
 
+    /**
+     * Spawns the healthbar in the determined position and changes the color if HP is low
+     * @param x 
+     * @param y 
+     * @param hpLeft Remaining HP
+     */
     draw (x:number, y:number, hpLeft: number)
     {
         this._bar.clear();

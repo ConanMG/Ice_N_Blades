@@ -7,6 +7,8 @@ export default class World01_Preloader extends Phaser.Scene {
         super({key:'preloader'})
     }
 
+    // This scene preloads all resources and launches the rest of scenes afterwards
+
     preload() {
         var progressBar = this.add.graphics();
         var progressBox = this.add.graphics();

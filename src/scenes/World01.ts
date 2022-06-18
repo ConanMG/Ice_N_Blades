@@ -42,6 +42,7 @@ export default class World01 extends Phaser.Scene {
     private character!: Lilith;
     private knives!: Phaser.Physics.Arcade.Group;
     private firebolts!: Phaser.Physics.Arcade.Group;
+    private enemies!: Phaser.Physics.Arcade.Group;
     private thieves!: Phaser.Physics.Arcade.Group;
     private skeletons!: Phaser.Physics.Arcade.Group;
     private slimes!: Phaser.Physics.Arcade.Group;
@@ -70,29 +71,18 @@ export default class World01 extends Phaser.Scene {
 
         const { width, height } = this.scale;
 
-        //Animaciones
-
-        createMainCharAnims(this.anims);
-        createThiefAnims(this.anims);
-        createSkeletonAnims(this.anims);
-        createSlimeAnims(this.anims);
-        createLamiaAnims(this.anims);
-        createMindflayerAnims(this.anims);
-        createTrollAnims(this.anims);
-        createGhostAnims(this.anims);
-        createFireboltAnims(this.anims);
-
-        //Creación de mapa y separación del mismo en capas
-
+        //#region "Map"
         var map = this.make.tilemap({ key: "map" });
         var tileset = map.addTilesetImage("stygia", "tiles", 16, 16, 0, 0);
 
         const ground = map.createLayer("Ground", tileset);
         const walls = map.createLayer("Walls", tileset);
-        this.physics.world.setBounds(423, 426, 1154, 1140, true, true, true, true);
-        walls.setCollisionByProperty({ collide: true });
 
-        //Añadir personaje y armas al mapa
+        //#endregion "Map"
+
+        //#region "Character"
+
+        createMainCharAnims(this.anims);
 
         this.knives = this.physics.add.group({
             classType: Phaser.Physics.Arcade.Image,
@@ -102,20 +92,30 @@ export default class World01 extends Phaser.Scene {
         this.character.setWeapon(this.knives);
         this.physics.world.wrap(this.character);
 
-        sceneEvents.on(
-            "enemy-killed",
-            (xpAmount: number) => {
-                console.log(xpAmount)
-                this.character.setXp(xpAmount);
-            },
-            this
-        );
+        //#endregion "Character"
 
-        //Crear los grupos de enemigos
+        //#region "Enemies"
+        createThiefAnims(this.anims);
+        createSkeletonAnims(this.anims);
+        createSlimeAnims(this.anims);
+        createLamiaAnims(this.anims);
+        createMindflayerAnims(this.anims);
+        createTrollAnims(this.anims);
+        createGhostAnims(this.anims);
+        createFireboltAnims(this.anims);
 
         this.firebolts = this.physics.add.group({
             classType: Phaser.Physics.Arcade.Sprite,
         });
+
+        this.enemies = this.physics.add.group({
+            classType: Enemy,
+            createCallback: (go) => {
+                const enemy = go as Enemy;
+                enemy.body.onCollide = true;
+            },
+        });
+
 
         this.thieves = this.physics.add.group({
             classType: Thief,
@@ -173,131 +173,9 @@ export default class World01 extends Phaser.Scene {
             },
         });
 
-        // Programación de la generación de enemigos
+        //#endregion "Enemies"
 
-        this.input.keyboard.on('keydown-' + 'ESC', () =>{
-            sceneEvents.emit('pause-game');
-        })
-
-        this.input.keyboard.on('keydown-' + 'ENTER', () => {
-
-            if (!this.waveOngoing) {
-                console.log("registered event")
-                sceneEvents.emit('wave-started', this.waveLength)
-                this.waveOngoing = true;
-                this._enemiesLevel += 2;
-
-                this.enemySpawner = this.time.addEvent({
-                    delay: 1000,
-                    callback: () => {
-                        var spawnableEnemies;
-                        if (this._enemiesLevel > 6)
-                            spawnableEnemies = 6
-                        else
-                            spawnableEnemies = this._enemiesLevel;
-                            
-                        switch (Math.round(Math.random() * spawnableEnemies)) {
-                            case 0:
-                                this.thieves
-                                    .get(
-                                        (1154) * Math.random() + 423,
-                                        (1140) * Math.random() + 426,
-                                        "Thief"
-                                    )
-                                    .setTarget(this.character);
-                                console.log('spawned Thief');
-                                break;
-                            case 1:
-                                this.ghosts
-                                    .get(
-                                        (1154 * Math.random()) + 423,
-                                        (1140 * Math.random()) + 426,
-                                        "Ghost"
-                                    )
-                                    .setTarget(this.character);
-                                console.log('spawned Ghost');
-                                break;
-                            case 2:
-                                this.skeletons
-                                    .get(
-                                        (1154 * Math.random()) + 423,
-                                        (1140 * Math.random()) + 426,
-                                        "Skeleton"
-                                    )
-                                    .setTarget(this.character);
-                                console.log('spawned Skeleton');
-                                break;
-                            case 3:
-                                this.slimes
-                                    .get(
-                                        (1154 * Math.random()) + 423,
-                                        (1140 * Math.random()) + 426,
-                                        "Slime"
-                                    )
-                                    .setTarget(this.character)
-                                console.log('spawned Slime');
-                                break;
-                            case 4:
-                                this.mindflayers
-                                    .get(
-                                        (1154 * Math.random()) + 423,
-                                        (1140 * Math.random()) + 426,
-                                        "Mindflayer"
-                                    )
-                                    .setTarget(this.character)
-                                console.log('spawned Mindflayer');
-                                break;
-                            case 5:
-                                this.lamias
-                                    .get(
-                                        (1154 * Math.random()) + 423,
-                                        (1140 * Math.random()) + 426,
-                                        "Lamia"
-                                    )
-                                    .setTarget(this.character)
-                                console.log('spawned Lamia');
-                                break;
-                            case 6:
-                                this.trolls
-                                    .get(
-                                        (1154 * Math.random()) + 423,
-                                        (1140 * Math.random()) + 426,
-                                        "Troll"
-                                    )
-                                    .setTarget(this.character)
-                                console.log('spawned Troll');
-                                break;
-                            default:
-                                break;
-                        }
-                        this.enemiesLeft++;
-                    },
-                    repeat: this.waveLength - 1
-                });
-
-                this.waveLength *= 2;
-            }
-        });
-
-        sceneEvents.emit('wave-ended');
-
-        sceneEvents.on('player-died', () => {
-            if (this.character.healthState() === Status.DEAD)
-                return;
-            this.thiefLiliColl.destroy()
-        })
-
-        sceneEvents.on('pause-game', ()=>{
-            this.scene.launch('PauseMenu')
-            this.scene.pause(this);
-            this.scene.pause('World01_UI')
-        })
-
-        sceneEvents.on('wave-ended', () => {
-            this.waveOngoing = false;
-        })
-
-        // Adición de físicas y colisiones
+        //#region "Physics and Collisions"
 
         this.physics.add.collider(this.character, walls);
         this.physics.add.collider(this.thieves, walls);
@@ -306,6 +184,7 @@ export default class World01 extends Phaser.Scene {
         this.physics.add.collider(this.lamias, walls);
         this.physics.add.collider(this.mindflayers, walls);
         this.physics.add.collider(this.trolls, walls);
+        this.physics.add.collider(this.enemies, this.enemies);
 
         this.physics.add.collider(
             this.knives,
@@ -428,7 +307,135 @@ export default class World01 extends Phaser.Scene {
         this.characterCollisions.push(this.mindflayerLiliColl);
         this.characterCollisions.push(this.trollLiliColl);
         this.characterCollisions.push(this.ghostLiliColl);
+        this.physics.world.setBounds(423, 426, 1154, 1140, true, true, true, true);
+        walls.setCollisionByProperty({ collide: true });
 
+        //#endregion "Physics and Collisions"
+
+        //#region "Events"  
+
+        this.input.keyboard.on('keydown-' + 'ESC', () =>{
+            sceneEvents.emit('pause-game');
+        });
+
+        sceneEvents.on('pause-game', ()=>{
+            this.scene.launch('PauseMenu');
+            this.scene.pause(this);
+            this.scene.pause('World01_UI');
+        });
+
+        //Starts a new wave, spawning random types of enemies
+        this.input.keyboard.on('keydown-' + 'ENTER', () => {
+
+            if (!this.waveOngoing) {
+                sceneEvents.emit('wave-started', this.waveLength);
+                this.waveOngoing = true;
+                this._enemiesLevel += 2;
+
+                this.enemySpawner = this.time.addEvent({
+                    delay: 1000,
+                    callback: () => {
+                        var spawnableEnemies;
+                        if (this._enemiesLevel > 6)
+                            spawnableEnemies = 6;
+                        else
+                            spawnableEnemies = this._enemiesLevel;
+                            
+                        switch (Math.round(Math.random() * spawnableEnemies)) {
+                            case 0:
+                                this.enemies.add(
+                                this.thieves
+                                    .get(
+                                        (1154) * Math.random() + 423,
+                                        (1140) * Math.random() + 426,
+                                        "Thief"
+                                    )
+                                );
+                                break;
+                            case 1:
+                                this.ghosts
+                                    .get(
+                                        (1154 * Math.random()) + 423,
+                                        (1140 * Math.random()) + 426,
+                                        "Ghost"
+                                    )
+                                    .setTarget(this.character);
+                                break;
+                            case 2:
+                                this.enemies.add(
+                                this.skeletons
+                                    .get(
+                                        (1154 * Math.random()) + 423,
+                                        (1140 * Math.random()) + 426,
+                                        "Skeleton"
+                                    )
+                                );
+                                break;
+                            case 3:
+                                this.enemies.add(
+                                this.slimes
+                                    .get(
+                                        (1154 * Math.random()) + 423,
+                                        (1140 * Math.random()) + 426,
+                                        "Slime"
+                                    )
+                                );
+                                break;
+                            case 4:
+                                this.enemies.add(
+                                this.mindflayers
+                                    .get(
+                                        (1154 * Math.random()) + 423,
+                                        (1140 * Math.random()) + 426,
+                                        "Mindflayer"
+                                    )
+                                );
+                                break;
+                            case 5:
+                                this.enemies.add(
+                                this.lamias
+                                    .get(
+                                        (1154 * Math.random()) + 423,
+                                        (1140 * Math.random()) + 426,
+                                        "Lamia"
+                                    )
+                                );
+                                break;
+                            case 6:
+                                this.enemies.add(
+                                this.trolls
+                                    .get(
+                                        (1154 * Math.random()) + 423,
+                                        (1140 * Math.random()) + 426,
+                                        "Troll"
+                                    )
+                                );
+                                break;
+                            default:
+                                break;
+                        }
+                        this.enemiesLeft++;
+                    },
+                    repeat: this.waveLength - 1
+                });
+
+                this.waveLength *= 2;
+            }
+        });
+
+        sceneEvents.emit('wave-ended');
+
+        sceneEvents.on('wave-ended', () => {
+            this.waveOngoing = false;
+        });
+
+        sceneEvents.on('player-died', () => {
+            if (this.character.healthState() === Status.DEAD)
+                return;
+            this.thiefLiliColl.destroy();
+        });
+        
+        //Makes the character dash
         var mistyStep = this.input.keyboard.on('keydown-SHIFT', () => {
             var lilith = this.character as Lilith
             if (lilith.healthState() === Status.DEAD || lilith.statusAilment() === Ailments.PETRIFIED)
@@ -436,12 +443,24 @@ export default class World01 extends Phaser.Scene {
             lilith.mistyStep(lilith.lastDirection(), this.physics.world);
         });
 
-        // Manejo de la cámara
+        sceneEvents.on('enemy-killed',(xpAmount: number) => {
+                this.character.setXp(xpAmount);
+            },
+            this
+        );
+
+        //#endregion "Events"
+
+        //#region "Camera"
         this.cameras.main.startFollow(this.character, true, 1, 1);
         this.cameras.main.centerOn(this.character.x, this.character.y);
         this.cameras.main.zoom = 3;
-        this.cameras.main.setDeadzone(50, 50)
+        this.cameras.main.setDeadzone(50, 50);
+
+        //#endregion "Camera"
     }
+
+    //#region "Collision handlers"
 
     private onKnifeWallCollision(
         knife: Phaser.GameObjects.GameObject,
@@ -510,6 +529,7 @@ export default class World01 extends Phaser.Scene {
         sceneEvents.emit("player-took-damage", this.character.hp());
 
     }
+    //#endregion "Collision handlers"
 
     update() {
 
@@ -536,39 +556,11 @@ export default class World01 extends Phaser.Scene {
             this.character.update(this.cursors);
         }
 
-        if (this.thieves.children) {
-            this.thieves.getChildren().forEach((thief) => {
-                thief.update();
-            });
-        }
-
-        if (this.skeletons.children) {
-            this.skeletons.getChildren().forEach((skeleton) => {
-                skeleton.update();
-            });
-        }
-
-        if (this.slimes.children) {
-            this.slimes.getChildren().forEach((slime) => {
-                slime.update();
-            });
-        }
-
-        if (this.lamias.children) {
-            this.lamias.getChildren().forEach((lamia) => {
-                lamia.update();
-            });
-        }
-
-        if (this.mindflayers.children) {
-            this.mindflayers.getChildren().forEach((mindflayer) => {
-                mindflayer.update();
-            });
-        }
-
-        if (this.trolls.children) {
-            this.trolls.getChildren().forEach((troll) => {
-                troll.update();
+        if (this.enemies.children) {
+            this.enemies.getChildren().forEach((child) => {
+                let enemy = child as Enemy;
+                enemy.update();
+                enemy.setTarget(this.character);
             });
         }
 

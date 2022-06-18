@@ -3,20 +3,10 @@ import IBoss from "~/interfaces/IBoss";
 import { Direction, Status } from "~/utils/Enums";
 import { Enemy } from "./Enemies";
 
-const movementPattern = (exclude:Direction)=>{
-
-    let newDirection = Phaser.Math.Between(0,4);
-
-    while(newDirection === exclude){
-
-        newDirection = Phaser.Math.Between(0,4);
-
-    }
-    
-    return newDirection;
-}
 export default class Troll extends Enemy implements IBoss{
     
+    //Troll's unique ability allows them to heal every 6 seconds and gain statistics each time they receive damage
+
     private regenEvent: Phaser.Time.TimerEvent;
 
     constructor(scene: Phaser.Scene, x: number, y: number, texture: string, frame?: number | undefined){

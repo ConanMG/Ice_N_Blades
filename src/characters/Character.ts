@@ -1,7 +1,7 @@
 import Phaser, { Time } from "phaser";
 import { sceneEvents } from "~/events/EventManager";
 import { HealthBar } from "~/utils/Healthbar";
-import { Direction, Status, Ailments } from "~/utils/Enums";
+import { Direction, Status, Ailments, Skills } from "~/utils/Enums";
 
 export abstract class Character extends Phaser.Physics.Arcade.Sprite {
 
@@ -12,7 +12,7 @@ export abstract class Character extends Phaser.Physics.Arcade.Sprite {
     protected _healthState!: Status;
     protected _statusAilments!: Ailments;
     private _inmune: boolean = false;
-    protected _skills!: Map<string, number>
+    protected _skills!: Map<Skills, number>
     protected _cooldowns!: Map<string, number>
     protected _ac!: number;
     protected _gameOver!: boolean;
@@ -28,6 +28,8 @@ export abstract class Character extends Phaser.Physics.Arcade.Sprite {
     protected _lastDirection!: Direction;
     protected _healthBar!: HealthBar;
     protected _poisonEvent!: Phaser.Time.TimerEvent;
+
+    //#region Getters and Setters
 
     public hp() {
         return this._hp;
@@ -92,37 +94,45 @@ export abstract class Character extends Phaser.Physics.Arcade.Sprite {
     public poisonEvent(){
         return this._poisonEvent;
     }
+    //#endregion Getters and Setters
 
+    /**
+     * Checks if the character has enough experience to level up
+     */
     checkXp() {
         if (this._xp >= this.NEXT_LEVEL_XP)
             this.levelUp()
     }
 
-    lowerSkill(skill: string) {
+    /**
+     * Lower's the value of one skill by one
+     * @param skill skill you want to lower
+     */
+    lowerSkill(skill: Skills) {
         switch (skill) {
-            case 'str':
-                this._skills['str']--
+            case Skills.STRENGTH:
+                this._skills[Skills.STRENGTH]--
                 this._skillPoints++
                 break;
-            case 'dex':
-                this._skills['dex']--
+            case Skills.DEXTERITY:
+                this._skills[Skills.DEXTERITY]--
                 this._skillPoints++
                 break;
-            case 'con':
-                this._skills['con']--
+            case Skills.CONSTITUTION:
+                this._skills[Skills.CONSTITUTION]--
                 this._hp -= 100 * this._lvl
                 this._skillPoints++
                 break;
-            case 'int':
-                this._skills['int']--
+            case Skills.INTELLIGENCE:
+                this._skills[Skills.INTELLIGENCE]--
                 this._skillPoints++
                 break;
-            case 'wis':
-                this._skills['wis']--
+            case Skills.WISDOM:
+                this._skills[Skills.WISDOM]--
                 this._skillPoints++
                 break;
-            case 'cha':
-                this._skills['cha']--
+            case Skills.CHARISMA:
+                this._skills[Skills.CHARISMA]--
                 this._skillPoints++
                 break;
             default:
@@ -130,35 +140,39 @@ export abstract class Character extends Phaser.Physics.Arcade.Sprite {
         }
     }
 
-    raiseSkill(skill: string) {
+    /**
+     * Increases's the value of one skill by one
+     * @param skill skill you want to raise
+     */
+    raiseSkill(skill: Skills) {
         switch (skill) {
-            case 'str':
-                this._skills['str']++;
+            case Skills.STRENGTH:
+                this._skills[Skills.STRENGTH]++;
                 this._skillPoints--;
                 this.calculateDamageSpeed();
                 break;
-            case 'dex':
-                this._skills['dex']++;
+            case Skills.DEXTERITY:
+                this._skills[Skills.DEXTERITY]++;
                 this._skillPoints--;
-                this._speed = this._skills['dex'] + 100;
+                this._speed = this._skills[Skills.DEXTERITY] + 100;
                 this.calculateDamageSpeed();
                 break;
-            case 'con':
-                this._skills['con']++;
+            case Skills.CONSTITUTION:
+                this._skills[Skills.CONSTITUTION]++;
                 this._skillPoints--;
-                this._MAX_HP = this._skills['con'] * 10;
+                this._MAX_HP = this._skills[Skills.CONSTITUTION] * 10;
                 this._healthBar.expandHealth(this._MAX_HP);
                 break;
-            case 'int':
-                this._skills['int']++;
+            case Skills.INTELLIGENCE:
+                this._skills[Skills.INTELLIGENCE]++;
                 this._skillPoints--;
                 break;
-            case 'wis':
-                this._skills['wis']++;
+            case Skills.WISDOM:
+                this._skills[Skills.WISDOM]++;
                 this._skillPoints--;
                 break;
-            case 'cha':
-                this._skills['cha']++;
+            case Skills.CHARISMA:
+                this._skills[Skills.CHARISMA]++;
                 this._skillPoints--;
                 break;
             default:
@@ -166,15 +180,18 @@ export abstract class Character extends Phaser.Physics.Arcade.Sprite {
         }
     }
 
+    /**
+     * Increases the character's level and regenerates it's health
+     * also concedes skillpoints
+     */
     levelUp() {
-        console.log("LEVEL UP!!!")
 
         sceneEvents.emit('player-leveled-up')
         console.log(this._lvl)
 
         this.NEXT_LEVEL_XP += 10 * this._lvl;
         this._xp = 0;
-        this._MAX_HP += 1 * this._skills['con'];
+        this._MAX_HP += 1 * this._skills[Skills.CONSTITUTION];
         this._hp = this._MAX_HP;
 
         this._healthBar.expandHealth(this._MAX_HP);
@@ -182,6 +199,12 @@ export abstract class Character extends Phaser.Physics.Arcade.Sprite {
         this._skillPoints += 2;
     }
 
+    /**
+     * Manages the character's hit event
+     * @param damage Damage taken
+     * @param dir Vector direction in which the character is thrown by the attack
+     * @returns 
+     */
     onHit(damage: number, dir?: Phaser.Math.Vector2) {
         if (this._healthState != Status.HEALTHY) {
             return;
@@ -199,22 +222,32 @@ export abstract class Character extends Phaser.Physics.Arcade.Sprite {
         this._healthBar.draw(this.x - 12.5, this.y - 15, this._hp)
     }
 
+    /**
+     * Sets the initial statistics of the character and sets the variables that depend
+     * on this statitstics. E.g: MAX_HP, Speed, etc.
+     * @param str Strength value
+     * @param dex Dexterity value
+     * @param con Constitution value
+     * @param int Intelligence value
+     * @param wis Wisdom value
+     * @param cha Charisma value
+     */
     setupSkills(str: number, dex: number, con: number, int: number, wis: number, cha: number) {
-        this._skills = new Map<string, number>([
-            ['str', 0],
-            ['dex', 0],
-            ['con', 0],
-            ['int', 0],
-            ['wis', 0],
-            ['cha', 0]
+        this._skills = new Map<Skills, number>([
+            [Skills.STRENGTH, 0],
+            [Skills.DEXTERITY, 0],
+            [Skills.CONSTITUTION, 0],
+            [Skills.INTELLIGENCE, 0],
+            [Skills.WISDOM, 0],
+            [Skills.CHARISMA, 0]
         ])
 
-        this._skills['str'] = str;
-        this._skills['dex'] = dex;
-        this._skills['con'] = con;
-        this._skills['int'] = int;
-        this._skills['wis'] = wis;
-        this._skills['cha'] = cha;
+        this._skills[Skills.STRENGTH] = str;
+        this._skills[Skills.DEXTERITY] = dex;
+        this._skills[Skills.CONSTITUTION] = con;
+        this._skills[Skills.INTELLIGENCE] = int;
+        this._skills[Skills.WISDOM] = wis;
+        this._skills[Skills.CHARISMA] = cha;
 
         this._cooldowns = new Map<string, number>([
             ['mistyStep', 6]
@@ -222,7 +255,7 @@ export abstract class Character extends Phaser.Physics.Arcade.Sprite {
 
         this.calculateDamageSpeed()
 
-        this._MAX_HP = this._skills['con'] * 5;
+        this._MAX_HP = this._skills[Skills.CONSTITUTION] * 5;
 
         this._healthBar = new HealthBar(this.scene, this.x - 10, (this.y - this.height - 2), this._MAX_HP, this.width);
 
@@ -230,12 +263,12 @@ export abstract class Character extends Phaser.Physics.Arcade.Sprite {
 
     calculateDamageSpeed() {
 
-        if (this._skills['str'] > this._skills['dex'])
-            this._damage = this._skills['str'];
+        if (this._skills[Skills.STRENGTH] > this._skills[Skills.DEXTERITY])
+            this._damage = this._skills[Skills.STRENGTH];
         else
-            this._damage = this._skills['dex'];
+            this._damage = this._skills[Skills.DEXTERITY];
 
-        this._speed = this._skills['dex'] + 100;
+        this._speed = this._skills[Skills.DEXTERITY] + 100;
 
     }
 
@@ -270,7 +303,7 @@ export abstract class Character extends Phaser.Physics.Arcade.Sprite {
                 if(this._poisonEvent && this._poisonEvent.getOverallRemaining() > 0)
                     break;
                 this.setVelocity(this._speed);
-                this._speed = (this._skills['dex'] + 100) / 1.2;
+                this._speed = (this._skills[Skills.DEXTERITY] + 100) / 1.2;
                 this._poisonEvent = this.scene.time.addEvent({
                     delay: 1000,
                     callback: () => {

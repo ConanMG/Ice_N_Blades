@@ -22,6 +22,7 @@ export default class World01_UI extends Phaser.Scene {
 
     create() {
 
+        //#region "UI setup"
         const screenCenterX = this.cameras.main.worldView.x + this.cameras.main.width / 2;
         const screenCenterY = this.cameras.main.worldView.y + this.cameras.main.height / 2;
 
@@ -46,6 +47,10 @@ export default class World01_UI extends Phaser.Scene {
             },
             loop: true
         })
+
+        //#endregion "UI setup"
+
+        //#region "Events"
 
         var menuKey = this.input.keyboard.addKey('ESC');
         menuKey.on('keyup', (eventArgs) => {
@@ -152,6 +157,8 @@ export default class World01_UI extends Phaser.Scene {
             this.enemiesLeft++;
             txtEnemiesLeft.setText(`Enemies Left: ${this.enemiesLeft}`);
         }, this)
+
+        //#endregion "Events"
     }
 
 }

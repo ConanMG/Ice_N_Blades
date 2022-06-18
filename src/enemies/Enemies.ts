@@ -1,7 +1,7 @@
 import Phaser from "phaser";
 import { Character } from "~/characters/Character";
 import { sceneEvents } from "~/events/EventManager";
-import { Direction, Status } from "~/utils/Enums";
+import { Direction, Skills, Status } from "~/utils/Enums";
 
 export abstract class Enemy extends Phaser.Physics.Arcade.Sprite {
 
@@ -11,7 +11,7 @@ export abstract class Enemy extends Phaser.Physics.Arcade.Sprite {
     protected _speed!: number;
     protected _damage!: number;
     protected _ac!: number;
-    protected _stats!: Map<string, number>;
+    protected _stats!: Map<Skills, number>;
 
     protected _xpDrop: number = 0;
     protected _target!: Phaser.GameObjects.Components.Transform;
@@ -24,12 +24,6 @@ export abstract class Enemy extends Phaser.Physics.Arcade.Sprite {
 
     healthState() {
         return this._healthState;
-    }
-
-    constructor(scene: Phaser.Scene, x: number, y: number, texture: string, frame?: string | number) {
-        super(scene, x, y, texture, frame);
-
-
     }
 
     damage() {
@@ -48,41 +42,55 @@ export abstract class Enemy extends Phaser.Physics.Arcade.Sprite {
                 this._aggro = false;
     }
 
+    constructor(scene: Phaser.Scene, x: number, y: number, texture: string, frame?: string | number) {
+        super(scene, x, y, texture, frame);
+    }
+
+    /**
+     * Makes the enemy start chasing it's target again
+     */
     continueChase() {
         this._justHit = false;
     }
 
+    /**
+     * Sets the statistics of an enemy randomly between zero and the maximum number for each skill 
+     */
     setupStats(maxStr: number, maxDex: number, maxCon: number, maxInt: number, maxWis: number, maxCha: number) {
-        this._stats = new Map<string, number>([
-            ['str', 0],
-            ['dex', 0],
-            ['con', 0],
-            ['int', 0],
-            ['wis', 0],
-            ['cha', 0]
+        this._stats = new Map<Skills, number>([
+            [Skills.STRENGTH, 0],
+            [Skills.DEXTERITY, 0],
+            [Skills.CONSTITUTION, 0],
+            [Skills.INTELLIGENCE, 0],
+            [Skills.WISDOM, 0],
+            [Skills.CHARISMA, 0]
         ])
 
-        this._stats.set('str', Math.round(Math.random() * maxStr));
-        this._stats.set('dex', Math.round(Math.random() * maxDex));
-        this._stats.set('con', Math.round(Math.random() * maxCon));
-        this._stats.set('int', Math.round(Math.random() * maxInt));
-        this._stats.set('wis', Math.round(Math.random() * maxWis));
-        this._stats.set('cha', Math.round(Math.random() * maxCha));
+        this._stats.set(Skills.STRENGTH, Math.round(Math.random() * maxStr));
+        this._stats.set(Skills.DEXTERITY, Math.round(Math.random() * maxDex));
+        this._stats.set(Skills.CONSTITUTION, Math.round(Math.random() * maxCon));
+        this._stats.set(Skills.INTELLIGENCE, Math.round(Math.random() * maxInt));
+        this._stats.set(Skills.WISDOM, Math.round(Math.random() * maxWis));
+        this._stats.set(Skills.CHARISMA, Math.round(Math.random() * maxCha));
 
-        this._stats.forEach((value: number, key: string) => {
+        this._stats.forEach((value: number, key: Skills) => {
             this._xpDrop += 2 * value;
         })
 
-        if (this._stats.get('str')! > this._stats.get('dex')!)
-            this._damage = this._stats.get('str')!;
+        if (this._stats.get(Skills.STRENGTH)! > this._stats.get(Skills.DEXTERITY)!)
+            this._damage = this._stats.get(Skills.STRENGTH)!;
         else
-            this._damage = this._stats.get('dex')!;
+            this._damage = this._stats.get(Skills.DEXTERITY)!;
 
-        this.FULL_HP = 1 * this._stats.get('con')!;
+        this.FULL_HP = 1 * this._stats.get(Skills.CONSTITUTION)!;
         this._hp = this.FULL_HP;
-        this._speed = 100 + (this._stats.get('dex')! * 2);
+        this._speed = 100 + (this._stats.get(Skills.DEXTERITY)! * 2);
     }
 
+    /**
+     * Manages the hit damage and changes the current status
+     * @param damage Damage received
+     */
     onHit(damage: number) {
 
         if (this._healthState === Status.DAMAGED) {
@@ -101,6 +109,9 @@ export abstract class Enemy extends Phaser.Physics.Arcade.Sprite {
         }
     }
 
+    /**
+     * Manages the collision with a character object
+     */
     onPlayerCollision(dir: Phaser.Math.Vector2) {
 
         this._aggro = false;

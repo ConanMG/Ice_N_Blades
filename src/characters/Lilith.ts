@@ -1,7 +1,7 @@
 import Phaser, { Tilemaps } from "phaser";
 import { sceneEvents } from "~/events/EventManager";
 import ICaster from "~/interfaces/ICaster";
-import { Ailments, Direction, Status } from "~/utils/Enums"
+import { Ailments, Direction, Skills, Status } from "~/utils/Enums"
 import { Character } from "./Character";
 
 declare global{
@@ -33,42 +33,52 @@ export default class Lilith extends Character implements ICaster {
         this.anims.play("idle");
     }
 
+    /**
+     * TODO/ Cast the selected spell
+     * @param spellKey 
+     */
     castSpell(spellKey: string) {
         throw new Error("Method not implemented.");
     }
 
+    /**
+     * Sets the spells known by the character
+     */
     setSpellsPerInt(){
-        if(this._skills['int'] >= 10){
+        if(this._skills[Skills.INTELLIGENCE] >= 10){
             if(!this.spells.includes('Misty Step'))
                 this.spells.push('Misty Step')
         }
-        if(this._skills['int'] >= 12){
+        if(this._skills[Skills.INTELLIGENCE] >= 12){
             if(!this.spells.includes('Hellish Rebuke'))
                 this.spells.push('Hellish Rebuke')
         }
-        if(this._skills['int'] >= 14){
+        if(this._skills[Skills.INTELLIGENCE] >= 14){
             if(!this.spells.includes('Fire Ball'))
                 this.spells.push('Fire Ball')
         }
-        if(this._skills['int'] >= 16){
+        if(this._skills[Skills.INTELLIGENCE] >= 16){
             if(!this.spells.includes('Phantasmal Form'))
                 this.spells.push('Phantasmal Form')
         }
-        if(this._skills['int'] >= 18){
+        if(this._skills[Skills.INTELLIGENCE] >= 18){
             if(!this.spells.includes('Blur'))
                 this.spells.push('Blur')
         }
-        if(this._skills['int'] >= 20){
+        if(this._skills[Skills.INTELLIGENCE] >= 20){
             if(!this.spells.includes('Power Word: Death'))
                 this.spells.push('Power Word: Death')
         }
     }
-
-    raiseSkill(skill: string) {
+    
+    raiseSkill(skill: Skills) {
         super.raiseSkill(skill);
         this.setSpellsPerInt();
     }
 
+    /**
+     * Launches a knife in the last direction the character moved
+     */
     attack(){
 
         if(!this._weapon || this._statusAilments === Ailments.PETRIFIED || this._healthState === Status.DEAD){
@@ -146,6 +156,11 @@ export default class Lilith extends Character implements ICaster {
         }
     }
 
+    /**
+     * Performs a dash that gants the character invulnerability while active.
+     * @param dir The direction towards which the character dashes
+     * @param worldBound current world
+     */
     mistyStep(dir: Direction, worldBound: Phaser.Physics.Arcade.World) {
         this.mistyStepPlaying = true;
         if(dir === Direction.LEFT){
@@ -194,6 +209,10 @@ export default class Lilith extends Character implements ICaster {
 
 }
 
+/**
+    GameFactory allows the creation of the character and the implementation of that same character with
+    with only one method.
+*/
 Phaser.GameObjects.GameObjectFactory.register("Lilith", function(this:Phaser.GameObjects.GameObjectFactory, x:number, y:number, texture:string, frame?:string|number){
     var sprite= new Lilith(this.scene, x, y, texture, frame);
 

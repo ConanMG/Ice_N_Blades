@@ -18,3 +18,12 @@ export enum Direction {
     STOP
 }
 
+export enum Skills {
+    STRENGTH,
+    DEXTERITY,
+    CONSTITUTION,
+    INTELLIGENCE,
+    WISDOM,
+    CHARISMA
+}
+

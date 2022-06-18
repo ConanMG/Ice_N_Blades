@@ -4,6 +4,8 @@ import { Enemy } from "./Enemies";
 
 export default class Lamia extends Enemy{
 
+    //Lamia's unique ability has a chance to petrify enemies on hit
+
     constructor(scene: Phaser.Scene, x: number, y: number, texture: string, frame?: number | undefined){
         super(scene, x, y, texture, frame);
         

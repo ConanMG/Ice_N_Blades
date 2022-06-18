@@ -17,6 +17,8 @@ const randomDirection = (exclude:Direction)=>{
 
 export default class Slime extends Enemy {
 
+    //Slime's unique ability has a chance to poison enemies on hit
+
     constructor(scene: Phaser.Scene, x: number, y: number, texture: string, frame?: string | number) {
         super(scene, x, y, texture, frame);
         

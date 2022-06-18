@@ -4,6 +4,8 @@ import { Enemy } from "./Enemies";
 
 export default class Ghost extends Enemy{
 
+    //Ghost's unique ability makes them able to phase through walls
+    
     constructor(scene: Phaser.Scene, x: number, y: number, texture: string, frame?: number | undefined){
         super(scene, x, y, texture, frame);
         

@@ -6,6 +6,8 @@ import { Enemy } from "./Enemies";
 
 export default class Skeleton extends Enemy {
 
+    //Skeleton's unique ability gives them a chance to resurrect
+
     constructor(scene: Phaser.Scene, x: number, y: number, texture: string, frame?: number | undefined) {
         super(scene, x, y, texture, frame);
 
@@ -64,6 +66,7 @@ export default class Skeleton extends Enemy {
                 this.anims.stop()
                 this.anims.play('skeleton_death', true);
 
+                // Randomly determines if the skeleton raises again with a 20% probability
                 this.once('animationcomplete', () => {
                     let probability = Math.random() * 100;
                     if (probability >= 80) {
