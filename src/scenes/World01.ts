@@ -334,6 +334,7 @@ export default class World01 extends Phaser.Scene {
                 sceneEvents.emit('wave-started', this.waveLength);
                 this.waveOngoing = true;
                 this._enemiesLevel += 2;
+                Enemy.difficulty += 1;
                 let enemy: Enemy;
 
                 this.enemySpawner = this.time.addEvent({

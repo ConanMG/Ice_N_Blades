@@ -190,7 +190,7 @@ export abstract class Character extends Phaser.Physics.Arcade.Sprite {
 
         this.NEXT_LEVEL_XP += 10 * this._lvl;
         this._xp = 0;
-        this._MAX_HP += 1 * this._skills[Skills.CONSTITUTION];
+        this._MAX_HP += this._skills[Skills.CONSTITUTION] / 2;
         this._hp = this._MAX_HP;
 
         this._healthBar.expandHealth(this._MAX_HP);
@@ -254,7 +254,7 @@ export abstract class Character extends Phaser.Physics.Arcade.Sprite {
 
         this.calculateDamageSpeed()
 
-        this._MAX_HP = this._skills[Skills.CONSTITUTION] * 5;
+        this._MAX_HP = this._skills[Skills.CONSTITUTION] * 2;
 
         this._healthBar = new HealthBar(this.scene, this.x - 10, (this.y - this.height - 2), this._MAX_HP, this.width);
 
@@ -263,11 +263,11 @@ export abstract class Character extends Phaser.Physics.Arcade.Sprite {
     calculateDamageSpeed() {
 
         if (this._skills[Skills.STRENGTH] > this._skills[Skills.DEXTERITY])
-            this._damage = this._skills[Skills.STRENGTH];
+            this._damage = this._skills[Skills.STRENGTH] + (this._lvl * 5);
         else
-            this._damage = this._skills[Skills.DEXTERITY];
+            this._damage = this._skills[Skills.DEXTERITY] + (this._lvl * 5);
 
-        this._speed = this._skills[Skills.DEXTERITY] + 100;
+        this._speed = this._skills[Skills.DEXTERITY] + 100 + (this._lvl * 5);
 
     }
 

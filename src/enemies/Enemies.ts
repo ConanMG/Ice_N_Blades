@@ -21,13 +21,11 @@ export abstract class Enemy extends Phaser.Physics.Arcade.Sprite {
     protected _justHit!: boolean;
     protected _damageTime!: number;
     protected _gameOver: boolean = false;
+    public static difficulty: number = 0;
+
 
     healthState() {
         return this._healthState;
-    }
-
-    setHealthState(status: Status) {
-        this._healthState = status;
     }
 
     setHp(hp: number) {
@@ -86,13 +84,13 @@ export abstract class Enemy extends Phaser.Physics.Arcade.Sprite {
         })
 
         if (this._stats.get(Skills.STRENGTH)! > this._stats.get(Skills.DEXTERITY)!)
-            this._damage = this._stats.get(Skills.STRENGTH)!;
+            this._damage = this._stats.get(Skills.STRENGTH)!  + Enemy.difficulty * 5;
         else
-            this._damage = this._stats.get(Skills.DEXTERITY)!;
+            this._damage = this._stats.get(Skills.DEXTERITY)!  + Enemy.difficulty * 5;
 
-        this.FULL_HP = 1 * this._stats.get(Skills.CONSTITUTION)!;
+        this.FULL_HP = 1 * this._stats.get(Skills.CONSTITUTION)! + Enemy.difficulty * 10;
         this._hp = this.FULL_HP;
-        this._speed = 100 + (this._stats.get(Skills.DEXTERITY)! * 2);
+        this._speed = 75 + (this._stats.get(Skills.DEXTERITY)! * 2) + Enemy.difficulty * 2;
     }
 
     /**

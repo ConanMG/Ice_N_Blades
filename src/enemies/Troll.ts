@@ -23,7 +23,7 @@ export default class Troll extends Enemy implements IBoss{
             loop: true
         });
 
-        this.FULL_HP = 100;
+        this.FULL_HP = 50;
         this._healthState = Status.HEALTHY;
         this.setScale(1.2);
     }
@@ -34,8 +34,8 @@ export default class Troll extends Enemy implements IBoss{
 
     onHit(damage: number): void {
         super.onHit(damage);
-        this._stats['str'] += 1;
-        this._stats['dex'] += 2;
+        this._stats['str'] += 10;
+        this._stats['dex'] += 10;
     }
 
     onPlayerCollision(dir: Phaser.Math.Vector2): void {
