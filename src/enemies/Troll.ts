@@ -23,7 +23,7 @@ export default class Troll extends Enemy implements IBoss{
             loop: true
         });
 
-        this.FULL_HP = 50;
+        this.FULL_HP = this._stats.get(Skills.CONSTITUTION)! + 50 + (Enemy.difficulty * 5);
         this._healthState = Status.HEALTHY;
         this.setScale(1.2);
     }

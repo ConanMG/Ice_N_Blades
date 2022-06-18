@@ -88,7 +88,7 @@ export abstract class Enemy extends Phaser.Physics.Arcade.Sprite {
         else
             this._damage = this._stats.get(Skills.DEXTERITY)!  + Enemy.difficulty * 5;
 
-        this.FULL_HP = 1 * this._stats.get(Skills.CONSTITUTION)! + Enemy.difficulty * 10;
+        this.FULL_HP = this._stats.get(Skills.CONSTITUTION)! + Enemy.difficulty * 5;
         this._hp = this.FULL_HP;
         this._speed = 75 + (this._stats.get(Skills.DEXTERITY)! * 2) + Enemy.difficulty * 2;
     }
