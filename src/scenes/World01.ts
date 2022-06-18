@@ -116,7 +116,6 @@ export default class World01 extends Phaser.Scene {
             },
         });
 
-
         this.thieves = this.physics.add.group({
             classType: Thief,
             createCallback: (go) => {
@@ -318,6 +317,11 @@ export default class World01 extends Phaser.Scene {
             sceneEvents.emit('pause-game');
         });
 
+        this.input.keyboard.on('keydown-' + 'R', () =>{
+            if(this.character.healthState() === Status.DEAD)
+                location.reload();
+        });
+
         sceneEvents.on('pause-game', ()=>{
             this.scene.launch('PauseMenu');
             this.scene.pause(this);
@@ -331,6 +335,7 @@ export default class World01 extends Phaser.Scene {
                 sceneEvents.emit('wave-started', this.waveLength);
                 this.waveOngoing = true;
                 this._enemiesLevel += 2;
+                let enemy: Enemy;
 
                 this.enemySpawner = this.time.addEvent({
                     delay: 1000,
@@ -343,13 +348,16 @@ export default class World01 extends Phaser.Scene {
                             
                         switch (Math.round(Math.random() * spawnableEnemies)) {
                             case 0:
-                                this.enemies.add(
+                                enemy = 
                                 this.thieves
                                     .get(
                                         (1154) * Math.random() + 423,
                                         (1140) * Math.random() + 426,
                                         "Thief"
-                                    )
+                                    );
+                                enemy.setTarget(this.character);
+                                this.enemies.add(
+                                    enemy
                                 );
                                 break;
                             case 1:
@@ -362,53 +370,68 @@ export default class World01 extends Phaser.Scene {
                                     .setTarget(this.character);
                                 break;
                             case 2:
-                                this.enemies.add(
+                                enemy  =
                                 this.skeletons
                                     .get(
                                         (1154 * Math.random()) + 423,
                                         (1140 * Math.random()) + 426,
                                         "Skeleton"
                                     )
+                                enemy.setTarget(this.character);
+                                this.enemies.add(
+                                    enemy
                                 );
                                 break;
                             case 3:
-                                this.enemies.add(
+                                enemy =
                                 this.slimes
                                     .get(
                                         (1154 * Math.random()) + 423,
                                         (1140 * Math.random()) + 426,
                                         "Slime"
                                     )
+                                enemy.setTarget(this.character);
+                                this.enemies.add(
+                                    enemy
                                 );
                                 break;
                             case 4:
-                                this.enemies.add(
+                                enemy =
                                 this.mindflayers
                                     .get(
                                         (1154 * Math.random()) + 423,
                                         (1140 * Math.random()) + 426,
                                         "Mindflayer"
                                     )
+                                enemy.setTarget(this.character);
+                                this.enemies.add(
+                                    enemy
                                 );
                                 break;
                             case 5:
-                                this.enemies.add(
+                                enemy =
                                 this.lamias
                                     .get(
                                         (1154 * Math.random()) + 423,
                                         (1140 * Math.random()) + 426,
                                         "Lamia"
                                     )
+                                enemy.setTarget(this.character);
+                                this.enemies.add(
+                                    enemy
                                 );
                                 break;
                             case 6:
-                                this.enemies.add(
+                                enemy =
                                 this.trolls
                                     .get(
                                         (1154 * Math.random()) + 423,
                                         (1140 * Math.random()) + 426,
                                         "Troll"
                                     )
+                                enemy.setTarget(this.character);
+                                this.enemies.add(
+                                    enemy
                                 );
                                 break;
                             default:
@@ -432,7 +455,6 @@ export default class World01 extends Phaser.Scene {
         sceneEvents.on('player-died', () => {
             if (this.character.healthState() === Status.DEAD)
                 return;
-            this.thiefLiliColl.destroy();
         });
         
         //Makes the character dash
@@ -560,7 +582,6 @@ export default class World01 extends Phaser.Scene {
             this.enemies.getChildren().forEach((child) => {
                 let enemy = child as Enemy;
                 enemy.update();
-                enemy.setTarget(this.character);
             });
         }
 

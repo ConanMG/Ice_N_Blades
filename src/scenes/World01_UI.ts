@@ -10,6 +10,7 @@ export default class World01_UI extends Phaser.Scene {
 
     private level: number;
     private waveBlink!: Phaser.Time.TimerEvent;
+    private restartBlink!: Phaser.Time.TimerEvent;
     private wave: number = 0;
     private enemiesLeft: number = 0;
     private killCount: number = 0;
@@ -37,13 +38,17 @@ export default class World01_UI extends Phaser.Scene {
         var nextWave = this.add.text(screenCenterX, (screenCenterY + screenCenterY) - 48, "Press '↵ Enter' to release the horde.", { font: '2em Georgia', color: '#000000' });
         nextWave.setX(nextWave.x - nextWave.width / 2)
 
+        var txtRestart = this.add.text(screenCenterX, nextWave.y - 48, "Press 'R' to restart.", { font: '2em Georgia', color: '#000000' }).setVisible(false);
+        txtRestart.setX(txtRestart.x - txtRestart.width / 2)
+
         this.waveBlink = this.time.addEvent({
             delay: 500,
             callback: () => {
                 if (nextWave.alpha > 0)
-                    nextWave.setAlpha(nextWave.alpha - 10)
+                    nextWave.setAlpha(nextWave.alpha - 1)
                 else
-                    nextWave.setAlpha(nextWave.alpha + 10)
+                    nextWave.setAlpha(nextWave.alpha + 1)
+
             },
             loop: true
         })
@@ -68,7 +73,7 @@ export default class World01_UI extends Phaser.Scene {
         sceneEvents.on('wave-started', (waveSpan) => {
             this.enemiesLeft = waveSpan;
             txtEnemiesLeft.setText(`Enemies Left: ${this.enemiesLeft}`);
-            this.wave++
+            this.wave++;
             txtWave.setText(`Wave ${this.wave}`);
             nextWave.visible = false;
             this.waveBlink.paused = true;
@@ -86,9 +91,10 @@ export default class World01_UI extends Phaser.Scene {
                 duration: 1500,
                 alpha: 1
             });
+            txtRestart.setVisible(true);
             deathScreen.setText("YOU DIED");
-            deathScreen.setX(deathScreen.x - (deathScreen.width / 2))
-            deathScreen.setX(deathScreen.y - (deathScreen.height / 2))
+            deathScreen.setX(deathScreen.x - (deathScreen.width / 2));
+            deathScreen.setX(deathScreen.y - (deathScreen.height / 2));
 
             var data = { "_kills": this.killCount.valueOf(), "_wave": this.wave.valueOf() }
             var leaderboardString: string = "";

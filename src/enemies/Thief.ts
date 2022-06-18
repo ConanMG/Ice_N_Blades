@@ -1,7 +1,4 @@
-import Phaser, { Physics } from 'phaser';
-import { Character } from '~/characters/Character';
-import { sceneEvents } from '~/events/EventManager';
-import { Direction, Status } from '~/utils/Enums';
+import { Status } from '~/utils/Enums';
 import { Enemy } from './Enemies';
 
 
@@ -16,26 +13,23 @@ export default class Thief extends Enemy {
         this.anims.play('thief_idle');
         this._healthState = Status.HEALTHY;
 
-        scene.physics.world.on(Phaser.Physics.Arcade.Events.TILE_COLLIDE, this.onTileCollision, this)
-    }
-
-    onTileCollision(go:Phaser.GameObjects.GameObject){
-        if (go !== this){
-            return;
-        }
     }
 
     preUpdate(time: number, delta: number): void {
         
         super.preUpdate(time,delta);
         
-        if (this._gameOver) {
+        if (this._gameOver || this._justHit) {
             return; 
         }
 
+        this.setAggro();
+        console.log(this._aggro)
+
         switch(this._healthState){
+
             case Status.HEALTHY:
-                if(this.body.velocity.x > 0 ){
+                if(this.body.velocity.x > 0){
                     this.anims.play('thief_run', true)
                     this.flipX = true;
                 }
@@ -56,32 +50,33 @@ export default class Thief extends Enemy {
                 this.on('animationcomplete', ()=>{
                     this._healthState = Status.HEALTHY;
                 })
-                return;
+                break;
             case Status.DEAD:
                 this.setVelocity(0);
+                this._gameOver = true;
+                this.body.onCollide = false;
+                this.anims.stop()
                 this.anims.play('thief_death', true);
                 this.on("animationcomplete", ()=>{
-                    this._gameOver = true;
                     this.destroy();
                 });
-                return;
-        }
-    
-        if(this._target){
-                this.setAggro()
+                break;
         }
     }
 
     update() {
         
-        super.update()
+        super.update();
 
-        if (this._gameOver || this._justHit) {
+        if(this._justHit || this._gameOver) {
             return; 
         }
+
+        if(this._aggro){
+            this.scene.physics.moveToObject(this, this._target!, this._speed)
+        }
         else{
-            if(this._aggro)
-                this.scene.physics.moveToObject(this, this._target!, this._speed)
+            this.setVelocity(0,0)
         }
     }
 

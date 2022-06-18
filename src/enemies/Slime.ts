@@ -37,6 +37,7 @@ export default class Slime extends Enemy {
     }
 
     preUpdate(time: number, delta: number) {
+        
         super.preUpdate(time, delta);
 
         if (this._gameOver || this._justHit) {
@@ -88,13 +89,12 @@ export default class Slime extends Enemy {
 
         super.update()
 
-        if(this._justHit || this._gameOver)
+        if(this._justHit || this._gameOver){
             return;
+        }
 
-        if(this._aggro)
+        if(this._aggro){
             this.scene.physics.moveToObject(this, this._target!, this._speed)
-        else{
-            this.setVelocity(0,0)
         }
     }
 
