@@ -32,8 +32,6 @@
 		"backend": "file:src/dbConn",
 		"events": "^3.3.0",
 		"phaser": "^3.55.2",
-		"parcel-plugin-clean-easy": "^1.0.2",
-		"parcel-plugin-static-files-copy": "^2.4.3",
 		"regenerator-runtime": "^0.13.9",
 		"utils": "^0.3.1"
 	},
