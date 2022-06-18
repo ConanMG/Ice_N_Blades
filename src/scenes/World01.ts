@@ -578,9 +578,6 @@ export default class World01 extends Phaser.Scene {
         }
 
         if (this.enemies.children) {
-            if(this.enemies.children.size === 0){
-                sceneEvents.emit('enemies-dead');
-            }
             this.enemies.getChildren().forEach((child) => {
                 let enemy = child as Enemy;
                 enemy.update();

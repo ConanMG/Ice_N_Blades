@@ -187,7 +187,6 @@ export abstract class Character extends Phaser.Physics.Arcade.Sprite {
     levelUp() {
 
         sceneEvents.emit('player-leveled-up')
-        console.log(this._lvl)
 
         this.NEXT_LEVEL_XP += 10 * this._lvl;
         this._xp = 0;

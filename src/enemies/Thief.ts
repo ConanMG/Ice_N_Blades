@@ -24,7 +24,6 @@ export default class Thief extends Enemy {
         }
 
         this.setAggro();
-        console.log(this._aggro)
 
         switch(this._healthState){
 

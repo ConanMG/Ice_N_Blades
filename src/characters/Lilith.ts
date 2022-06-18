@@ -170,7 +170,6 @@ export default class Lilith extends Character implements ICaster {
         this.anims.play('disappear', true);
         this._healthBar.hide()
         this.once('animationcomplete', () => {
-            console.log(dir)
             this.anims.play('appear', true)
             switch(dir) {
                 case Direction.RIGHT:

@@ -84,10 +84,6 @@ export default class World01_UI extends Phaser.Scene {
             this.waveBlink.paused = false;
         })
 
-        sceneEvents.on('enemies-dead', ()=>{
-            this.enemiesLeft = 0;
-        })
-
         sceneEvents.on('player-died', async () => {
             deathScreen.alpha = 0;
             this.tweens.add({
