@@ -1,6 +1,6 @@
 import Phaser from "phaser";
 import IBoss from "~/interfaces/IBoss";
-import { Direction, Status } from "~/utils/Enums";
+import { Direction, Skills, Status } from "~/utils/Enums";
 import { Enemy } from "./Enemies";
 
 export default class Troll extends Enemy implements IBoss{
