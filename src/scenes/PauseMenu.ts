@@ -21,6 +21,8 @@ export default class PauseMenu extends Phaser.Scene {
         let textPaused = this.add.text(screenCenterX, screenCenterY, 'PAUSED', { font: '7em Georgia', color: '#000000' }).setOrigin(0)
         let txtMovement = this.add.text(screenCenterX, screenCenterY + textPaused.height + 8, `↑ up, ↓ down, ← left, → right to move`, { font: '2em Georgia', color: '#000000' }).setDepth(-2);
         let txtAttack = this.add.text(screenCenterX, txtMovement.y + txtMovement.height + 8, `Spacebar to attack`, { font: '2em Georgia', color: '#000000' }).setDepth(-2);
+        let txtDash = this.add.text(screenCenterX, txtAttack.y + txtAttack.height + 8, `'⇧ Shift' to attack`, { font: '2em Georgia', color: '#000000' }).setDepth(-2);
+        txtDash.setX(txtDash.x - txtDash.width/2);
         txtMovement.setX(txtMovement.x - txtMovement.width/2);
         txtAttack.setX(txtAttack.x - txtAttack.width/2);
         textPaused.setX(textPaused.x - textPaused.width/2);

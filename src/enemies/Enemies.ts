@@ -26,6 +26,14 @@ export abstract class Enemy extends Phaser.Physics.Arcade.Sprite {
         return this._healthState;
     }
 
+    setHealthState(status: Status) {
+        this._healthState = status;
+    }
+
+    setHp(hp: number) {
+        this._hp = hp;
+    }
+
     damage() {
         return this._damage;
     }

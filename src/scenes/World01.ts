@@ -183,7 +183,6 @@ export default class World01 extends Phaser.Scene {
         this.physics.add.collider(this.lamias, walls);
         this.physics.add.collider(this.mindflayers, walls);
         this.physics.add.collider(this.trolls, walls);
-        this.physics.add.collider(this.enemies, this.enemies);
 
         this.physics.add.collider(
             this.knives,
@@ -579,6 +578,9 @@ export default class World01 extends Phaser.Scene {
         }
 
         if (this.enemies.children) {
+            if(this.enemies.children.size === 0){
+                sceneEvents.emit('enemies-dead');
+            }
             this.enemies.getChildren().forEach((child) => {
                 let enemy = child as Enemy;
                 enemy.update();

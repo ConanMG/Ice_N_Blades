@@ -96,6 +96,9 @@ export default class Slime extends Enemy {
         if(this._aggro){
             this.scene.physics.moveToObject(this, this._target!, this._speed)
         }
+        else{
+            this.setVelocity(0,0)
+        }
     }
 
 }
