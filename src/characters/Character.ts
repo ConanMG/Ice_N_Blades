@@ -312,7 +312,6 @@ export abstract class Character extends Phaser.Physics.Arcade.Sprite {
                         setTimeout(() => {
                             this.setTint(0xffffff);
                         }, 300)
-                        console.log(this._poisonEvent.getOverallRemaining())
                         if(this._poisonEvent.getOverallRemaining() <= 0){
                             this._statusAilments = Ailments.NONE;
                         }
@@ -382,7 +381,6 @@ export abstract class Character extends Phaser.Physics.Arcade.Sprite {
                 this.play('idle', true)
             }
         }
-        console.log(this._hp);
         this._healthBar.draw(this.x - 9, this.y - 18, this._hp)
 
     }
