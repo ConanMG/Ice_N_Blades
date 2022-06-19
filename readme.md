@@ -70,8 +70,8 @@
 	<h2>MANUAL DE USUARIO</h2>
 	<p>
 		<ul>
-			<li>↑ flecha arriba, ↓ flecha abajo, ← flecha derecha, → flecha izquierda para moverse</li>
-			<li>Barra espaciadora ⎵ para atacar</li>
+			<li>↑ flecha arriba, ↓ flecha abajo, ← flecha izquierda, → flecha derecha para moverse</li>
+			<li>⎵ Barra espaciadora para atacar</li>
 			<li>⇧ Shift para dashear</li>
 			<li>↵ Enter para generar enemigos cada vez que termina una oleada.</li>
 			<li>R para reiniciar el juego una vez el personaje pricipal muera.</li>
