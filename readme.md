@@ -54,7 +54,7 @@
 	<h2>MANUAL DEL PROGRAMADOR</h2>
 	<p>
 		Para la edición de esta aplicación es necesario entender todos los puntos del apartado anterior. Además de esto, es necesario entender la estructura de la
-		aplicación. Las carpetas están dividas en tres carpetas pricipales:
+		aplicación. Las carpetas están estructuradas de la siguiente forma:
 			<ul>
 				<li>public: contiene los recursos del juego (sprites, mapas, casillas, etc.)</li>
 				<li>src: contiene todo el código de la aplicación</li>
