@@ -53,7 +53,36 @@
 <section id="manualProg">
 	<h2>MANUAL DEL PROGRAMADOR</h2>
 	<p>
-		Para la edición de esta aplicación es necesario entender todos los apartados del apartado anterior. Además de esto, es necesario entender la estructura de la
-		aplicación. Las carpetas están dividas
+		Para la edición de esta aplicación es necesario entender todos los puntos del apartado anterior. Además de esto, es necesario entender la estructura de la
+		aplicación. Las carpetas están dividas en tres carpetas pricipales:
+			<ul>
+				<li>public: contiene los recursos del juego (sprites, mapas, casillas, etc.)</li>
+				<li>src: contiene todo el código de la aplicación</li>
+				<li>docs: contiene la aplicación construida</li>
+			</ul>
+				Los enemigos tienen una clase abstracta con una serie de métodos comunes entre ellos de forma que resulte más sencillo la creación de enemigos nuevos.
+				Lo mismo ocurre con los PCs (Player Character) en caso de que se quisiera agregar otro personaje pricipal que poder selecionar.
+				Las escenas están ordenadas en una carpeta y algunas como la de pausa pueden ser reutilizables al igual que los contenidos la carpeta de utilidades que pueden				ser útiles para cualquier escena (barras de vida, debuggers de colsiones, etc.).
+	</p>
+</section>
+	
+<section id="manualUser">
+	<h2>MANUAL DE USUARIO</h2>
+	<p>
+		<ul>
+			<li>↑ flecha arriba, ↓ flecha abajo, ← flecha derecha, → flecha izquierda para moverse</li>
+			<li>Barra espaciadora ⎵ para atacar</li>
+			<li>⇧ Shift para dashear</li>
+			<li>↵ Enter para generar enemigos cada vez que termina una oleada.</li>
+			<li>R para reiniciar el juego una vez el personaje pricipal muera.</li>
+		</ul>
+	</p>
+</section>
+	
+<section id="api">
+	<h2>USO DE LA API</h2>
+	<p>
+		La API de está aplicación consta de dos peticiones, un post y u get. Para la información de la API seguir el siguiente enlace:
+		<a href="https://documenter.getpostman.com/view/20952107/UzBmM7Lq">API Docs</a>
 	</p>
 </section>
