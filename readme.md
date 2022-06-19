@@ -3,19 +3,6 @@
 <h3><i>Proyecto de fin de grado</i></h3>
 <br>
 
-<ol>
-	<h3><li><a href="#description">Descripción</a></li></h3>
-	<h3><li><a href="#tecnologies">Tecnologías</a></li></h3>
-		<ul>
-			<h4><li><a href="#phaser3">Phaser 3</a></li></h4>
-			<h4><li><a href="#parcel">Parcel</a></li></h4>
-			<h4><li><a href="#babel">Babel</a></li></h4>
-			<h4><li><a href="#node">Node.js</a></li></h4>
-		</ul>
-	<h3><li><a href="#manualProg">Manual de programador</a></li></h3>
-	<h3><li><a href="#manualUser">Manual de usuario</a></li></h3>
-	<h3><li><a href="#api">Llamadas a API</a></li></h3>
-</ol>
 <hr></hr>
 
 <section id="description">
@@ -26,7 +13,7 @@
 		</p>
 		<p>
 			El juego esta programado en TypeScript y consta de una pantalla de carga
-			que precarga el resto de escenas y una serie de pantallas de pantallas de ayuda (UI y pausa).
+			que precarga el resto de escenas y una serie de pantallas de ayuda (UI y pausa).
 			El juego recoge información sobre las puntuaciones de los jugadores de una base de
 			datos mongoDB a través de un backend de Node.JS con Mongoose posteado en Heroku. Al estar
 			programado en TypeScript, el juego esta embebido en una página web desde la que
