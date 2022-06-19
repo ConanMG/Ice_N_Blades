@@ -16,7 +16,7 @@
 			que precarga el resto de escenas y una serie de pantallas de ayuda (UI y pausa).
 			El juego recoge información sobre las puntuaciones de los jugadores de una base de
 			datos mongoDB a través de un backend de Node.JS con Mongoose posteado en Heroku. Al estar
-			programado en TypeScript, el juego esta embebido en una página web desde la que
+			programado en TypeScript, el juego esta en una página web desde la que
 			poder jugarlo.
 		</p>
 </section>
