@@ -74,7 +74,7 @@
 			<li>⎵ Barra espaciadora para atacar</li>
 			<li>⇧ Shift para dashear</li>
 			<li>↵ Enter para generar enemigos cada vez que termina una oleada.</li>
-			<li>R para reiniciar el juego una vez el personaje pricipal muera.</li>
+			<li>R para reiniciar el juego una vez el personaje principal muera.</li>
 		</ul>
 	</p>
 </section>
