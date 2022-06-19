@@ -23,24 +23,37 @@
 
 <section id="tecnologies">
 	<h2>TECNOLOGÍAS</h2>
-		<ul>
-			<section id="phaser3">
-				<li><h3>Phaser 3</h3></li>
-					<p>
-						Phaser 3 es un framework destinado a la creación de videojuegos web para HTML5. Phaser funciona a partir de escenas que se gestionan a partir de
-						tres métodos principalmente: preload, create y update. En el método preload se precargan los recursos que va a usar la escena, en el método create
-						se instancian todas las entidades que vayan a aparecer en la escena y se declara toda acción que vaya a tener lugar en el juego y el método update
-						es un bucle que corre constantemente actualizando todos los componentes de la escena (animaciones, eventos, etc.)
-					</p>
-			</section>
-			<section id="parcel">
-				<li><h3>Parcel</h3></li>
-			</section>
-			<section id="babel">
-				<li><h3>Babel</h3></li>
-			</section>
-			<section id="node">
-				<li><h3>Node.js</h3></li>
-			</section>
-		</ul>
-	</section>
+	<ul>
+		<section id="phaser3">
+			<li><h3>Phaser 3</h3></li>
+				<p>
+					Phaser 3 es un framework destinado a la creación de videojuegos web para HTML5. Phaser funciona a partir de escenas que se gestionan a partir de
+					tres métodos principalmente: preload, create y update. En el método preload se precargan los recursos que va a usar la escena, en el método create
+					se instancian todas las entidades que vayan a aparecer en la escena y se declara toda acción que vaya a tener lugar en el juego y el método update
+					es un bucle que corre constantemente actualizando todos los componentes de la escena (animaciones, eventos, etc.)
+				</p>
+		</section>
+		<section id="parcel">
+			<li><h3>Parcel</h3></li>
+			<p>
+				Parcel es una herramienta para construir aplicaciones de javascript y css de forma sencilla y sin tener que configurarlo. Para iniciar tu proyacto
+				usas el comando "parcel [tu-índice]--open" y para construirlo "parcel build [tu-índice] --no-minify --out-dir [directorio-destino-build]".
+			</p>
+		</section>
+		<section id="node">
+			<li><h3>Node.js</h3></li>
+			<p>
+				Node.js es un entorno de ejecución de Javascript muy útil para el desarrollo de aplicaciones de backend. Node.js junto con mongoose (librería ODM)
+				constituyen el backend de la aplicación (la API)
+			</p>
+		</section>
+	</ul>
+</section>
+	
+<section id="manualProg">
+	<h2>MANUAL DEL PROGRAMADOR</h2>
+	<p>
+		Para la edición de esta aplicación es necesario entender todos los apartados del apartado anterior. Además de esto, es necesario entender la estructura de la
+		aplicación. Las carpetas están dividas
+	</p>
+</section>
