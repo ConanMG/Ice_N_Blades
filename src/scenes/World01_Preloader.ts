@@ -10,21 +10,17 @@ export default class World01_Preloader extends Phaser.Scene {
     // This scene preloads all resources and launches the rest of scenes afterwards
 
     preload() {
-        const screenCenterX = this.cameras.main.worldView.x + this.cameras.main.width / 2;
-        const screenCenterY = this.cameras.main.worldView.y + this.cameras.main.height / 2;
 
         var progressBar = this.add.graphics();
         var progressBox = this.add.graphics();
         progressBox.fillStyle(0x222222, 0.8);
         progressBox.fillRect(240, 270, 320, 50);
-        progressBox.setX(screenCenterX);
-        progressBox.setY(screenCenterY);
 
         this.load.on('progress', function (value) {
             console.log(value);
             progressBar.clear();
             progressBar.fillStyle(0xffffff, 1);
-            progressBar.fillRect(screenCenterX, screenCenterY, 300 * value, 30);
+            progressBar.fillRect(250, 280, 300 * value, 30);
         });
                     
         this.load.on('fileprogress', function (file) {
