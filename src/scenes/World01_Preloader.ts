@@ -24,7 +24,7 @@ export default class World01_Preloader extends Phaser.Scene {
             console.log(value);
             progressBar.clear();
             progressBar.fillStyle(0xffffff, 1);
-            progressBar.fillRect(250, 280, 300 * value, 30);
+            progressBar.fillRect(screenCenterX, screenCenterY, 300 * value, 30);
         });
                     
         this.load.on('fileprogress', function (file) {
