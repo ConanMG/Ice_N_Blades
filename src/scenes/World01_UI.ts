@@ -94,7 +94,7 @@ export default class World01_UI extends Phaser.Scene {
             txtRestart.setVisible(true);
             deathScreen.setText("YOU DIED");
             deathScreen.setX(deathScreen.x - (deathScreen.width / 2));
-            deathScreen.setX(deathScreen.y - (deathScreen.height / 2));
+            deathScreen.setY(deathScreen.y - (deathScreen.height / 2));
 
             var data = { "_kills": this.killCount.valueOf(), "_wave": this.wave.valueOf() }
             var leaderboardString: string = "";
